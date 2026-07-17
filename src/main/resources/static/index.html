@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personel Yönetim Sistemi</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="container">
+    <!-- Üst Bar: Başlık ve Gece Modu Butonu -->
+    <div class="top-bar">
+        <h1>👤 Personel Yönetim Sistemi</h1>
+        <button id="themeToggle" class="btn-theme">🌙 Gece Modu</button>
+    </div>
+
+    <!-- Durum Bildirimleri için Ortak Alan -->
+    <div id="statusMessage" class="message hidden"></div>
+
+    <!-- ========================================== -->
+    <!-- 🏠 BÖLÜM 1: ANA SAYFA (PERSONEL TABLOSU)  -->
+    <!-- ========================================== -->
+    <section id="homePage" class="view-section">
+        <!-- Üst Butonlar -->
+        <div class="action-bar">
+            <div class="left-actions">
+                <button id="btnYeniEkle" class="btn btn-primary">➕ Yeni Kişi Ekle</button>
+            </div>
+            <div class="right-actions">
+                <!-- Excel Yükleme Girişi (Gizli input, şık butona bağlı) -->
+                <input type="file" id="excelFile" accept=".xlsx" style="display: none;" />
+                <button id="btnExcelSec" class="btn btn-info">📤 Excel Yükle</button>
+                <button id="btnExcelIndir" class="btn btn-success">📥 Excel İndir</button>
+            </div>
+        </div>
+
+        <!-- Ana Tablo -->
+        <div class="card">
+            <h2>📋 Personel Listesi</h2>
+            <p class="info-text">* Bilgileri görmek için satıra <strong>Sol Tıklayın</strong>. Güncellemek veya silmek için satıra <strong>Sağ Tıklayın</strong>.</p>
+            <div class="table-responsive">
+                <table class="main-table">
+                    <thead>
+                    <tr>
+                        <th>TCKN</th>
+                        <th>İsim</th>
+                        <th>Soyisim</th>
+                        <th>Telefon</th>
+                        <th>Kart Son Güncelleme</th>
+
+                    </tr>
+                    </thead>
+                    <tbody id="personelTableBody">
+                    <!-- Veriler JS ile buraya dolacak -->
+                    <tr>
+                        <td colspan="5" style="text-align: center;">Yükleniyor...</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- 🔍 BÖLÜM 2: DETAY SAYFASI                 -->
+    <!-- ========================================== -->
+    <section id="detailPage" class="view-section hidden">
+        <button class="btn btn-secondary btn-back">⬅ Geri Dön</button>
+
+        <div class="card detail-card">
+            <h2>👤 Personel Detay Bilgisi</h2>
+
+            <div class="detail-layout">
+                <!-- Sol Üst Köşedeki Fotoğraf Alanı -->
+                <div class="photo-area">
+                    <div class="photo-box">
+                        <span class="photo-placeholder">👤<br>Fotoğraf Yok</span>
+                    </div>
+                </div>
+
+                <!-- Sağdaki Detay Tablosu -->
+                <div class="detail-info-table">
+                    <table>
+                        <tr><th>ID:</th><td id="detay-id">-</td></tr>
+                        <tr><th>TCKN:</th><td id="detay-tckn">-</td></tr>
+                        <tr><th>Adı:</th><td id="detay-ad">-</td></tr>
+                        <tr><th>Soyadı:</th><td id="detay-soyad">-</td></tr>
+                        <tr><th>Yaş:</th><td id="detay-yas">-</td></tr>
+                        <tr><th>Telefon:</th><td id="detay-telefon">-</td></tr>
+                        <tr><th>Maaş:</th><td id="detay-maas">-</td></tr>
+                        <tr><th>İşe Giriş Tarihi:</th><td id="detay-iseGiris">-</td></tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- ✍️ BÖLÜM 3: GÜNCELLEME SAYFASI             -->
+    <!-- ========================================== -->
+    <section id="updatePage" class="view-section hidden">
+        <button class="btn btn-secondary btn-back">⬅ İptal Et ve Geri Dön</button>
+
+        <div class="card">
+            <h2>✏️ Personel Bilgilerini Güncelle</h2>
+            <form id="updateForm" class="grid-form">
+                <input type="hidden" id="update-id">
+
+                <div class="form-group full-width">
+                    <label>TCKN (Güncellenemez):</label>
+                    <input type="text" id="update-tckn" readonly class="readonly-input">
+                </div>
+
+                <div class="form-group">
+                    <label for="update-ad">Adı:</label>
+                    <input type="text" id="update-ad" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="update-soyad">Soyadı:</label>
+                    <input type="text" id="update-soyad" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="update-telefon">Telefon:</label>
+                    <input type="text" id="update-telefon">
+                </div>
+
+                <div class="form-group">
+                    <label for="update-yas">Yaş:</label>
+                    <input type="number" id="update-yas" min="18" max="100">
+                </div>
+
+                <div class="form-group">
+                    <label for="update-maas">Maaş:</label>
+                    <input type="number" step="0.01" id="update-maas">
+                </div>
+
+                <div class="form-group">
+                    <label for="update-iseGiris">İşe Giriş Tarihi:</label>
+                    <input type="date" id="update-iseGiris" required>
+                </div>
+
+                <div class="form-group full-width">
+                    <button type="submit" class="btn btn-block btn-primary">💾 Kaydet ve Güncelle</button>
+                </div>
+            </form>
+        </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- ➕ BÖLÜM 4: YENİ EKLEME SAYFASI            -->
+    <!-- ========================================== -->
+    <section id="addPage" class="view-section hidden">
+        <button class="btn btn-secondary btn-back">⬅ Vazgeç ve Geri Dön</button>
+
+        <div class="card">
+            <h2>✨ Yeni Personel Ekle</h2>
+            <form id="personelForm" class="grid-form">
+                <div class="form-group">
+                    <label for="tckn">TCKN (11 Hane):</label>
+                    <input type="text" id="tckn" required maxlength="11" minlength="11" placeholder="12345678901">
+                </div>
+
+                <div class="form-group">
+                    <label for="ad">Adı:</label>
+                    <input type="text" id="ad" required placeholder="Ahmet">
+                </div>
+
+                <div class="form-group">
+                    <label for="soyad">Soyadı:</label>
+                    <input type="text" id="soyad" required placeholder="Yılmaz">
+                </div>
+
+                <div class="form-group">
+                    <label for="telefon">Telefon:</label>
+                    <input type="text" id="telefon" placeholder="05001234567">
+                </div>
+
+                <div class="form-group">
+                    <label for="yas">Yaş:</label>
+                    <input type="number" id="yas" min="18" max="100" placeholder="30">
+                </div>
+
+                <div class="form-group">
+                    <label for="maas">Maaş:</label>
+                    <input type="number" step="0.01" id="maas" placeholder="45000">
+                </div>
+
+                <div class="form-group full-width">
+                    <label for="iseGirisTarihi">İşe Giriş Tarihi:</label>
+                    <input type="date" id="iseGirisTarihi" required>
+                </div>
+
+                <div class="form-group full-width">
+                    <button type="submit" class="btn btn-block btn-primary">Kaydet / Yeni Ekle</button>
+                </div>
+            </form>
+        </div>
+    </section>
+</div>
+
+<!-- 🌐 ÖZEL SAĞ TIK MENÜSÜ (CONTEXT MENU) -->
+<div id="customContextMenu" class="context-menu hidden">
+    <ul>
+        <li id="menuGuncelle">✏️ Güncelle</li>
+        <li id="menuSil" class="menu-danger">❌ Sil</li>
+    </ul>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
+
+
+
