@@ -1,12 +1,14 @@
 package com.example.personellistesi.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
-@Table(name = "Personeller")
+@Table(name = "personeller")
 public class Personel {
 
     @Id
@@ -69,6 +71,24 @@ public class Personel {
     public void setIseGirisTarihi(LocalDate iseGirisTarihi) { this.iseGirisTarihi = iseGirisTarihi; }
     public LocalDateTime getKartSonGuncelleme() { return kartSonGuncelleme; }
     public void setKartSonGuncelleme(LocalDateTime kartSonGuncelleme) { this.kartSonGuncelleme = kartSonGuncelleme; }
+
+    // Personelin bağlı olduğu Departman
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "departman_id")
+    private Departman departman;
+
+    // Personele ait İzinler Listesi
+    @OneToMany(mappedBy = "personel", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore // JSON dönüşünde sonsuz döngüye (Infinite Loop) girmemesi için
+    private List<Izin> izinler;
+
+    // ─── YENİ GETTER VE SETTER METOTLARI ───
+
+    public Departman getDepartman() { return departman; }
+    public void setDepartman(Departman departman) { this.departman = departman; }
+
+    public List<Izin> getIzinler() { return izinler; }
+    public void setIzinler(List<Izin> izinler) { this.izinler = izinler; }
 }
 
 
