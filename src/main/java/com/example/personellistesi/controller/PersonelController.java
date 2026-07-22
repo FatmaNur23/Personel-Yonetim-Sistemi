@@ -81,12 +81,25 @@ public class PersonelController {
         }
     }
 
-    // ─── POST API: Tekli Personel Ekleme veya Güncelleme ───
-    @PostMapping("/kaydet")
-    public ResponseEntity<String> tekliKaydet(@RequestBody Personel personel) {
+    // ─── YENİ POST API: Tekli Personel Ekleme (Departman Seçimli) ───
+    @PostMapping
+    public ResponseEntity<?> personelEkle(@RequestBody Personel personel) {
         try {
-            String sonuc = personelService.kaydetVeyaGuncelle(personel);
-            return ResponseEntity.ok(sonuc);
+            Personel kaydedilen = personelService.personelEkle(personel);
+            return ResponseEntity.ok(kaydedilen);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Hata oluştu: " + e.getMessage());
+        }
+    }
+
+    // ─── YENİ PUT API: Tekli Personel Güncelleme (Departman Değişikliği Destekli) ───
+    @PutMapping("/{id}")
+    public ResponseEntity<?> personelGuncelle(@PathVariable String id, @RequestBody Personel personel) {
+        try {
+            Personel guncellenen = personelService.personelGuncelle(id, personel);
+            return ResponseEntity.ok(guncellenen);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         } catch (Exception e) {

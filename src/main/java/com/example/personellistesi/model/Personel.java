@@ -6,6 +6,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
+import jakarta.validation.constraints.NotNull;
 
 @Entity
 @Table(name = "personeller")
@@ -73,6 +74,7 @@ public class Personel {
     public void setKartSonGuncelleme(LocalDateTime kartSonGuncelleme) { this.kartSonGuncelleme = kartSonGuncelleme; }
 
     // Personelin bağlı olduğu Departman
+    @NotNull(message = "Personel kayıt edilirken departman bilgisi boş bırakılamaz!")
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "departman_id")
     private Departman departman;

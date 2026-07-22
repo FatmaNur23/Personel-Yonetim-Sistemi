@@ -1,9 +1,12 @@
 package com.example.personellistesi.service;
 
+import com.example.personellistesi.model.Departman;
 import com.example.personellistesi.model.Personel;
+import com.example.personellistesi.repo.DepartmanRepository;
 import com.example.personellistesi.repo.PersonelRepository;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -16,12 +19,11 @@ import java.util.*;
 
 @Service
 public class PersonelService {
+    @Autowired
+    private PersonelRepository personelRepository;
 
-    private final PersonelRepository personelRepository;
-
-    public PersonelService(PersonelRepository personelRepository) {
-        this.personelRepository = personelRepository;
-    }
+    @Autowired
+    private DepartmanRepository departmanRepository;
 
     // ─── 1. EXCEL'DEN VERİ OKUMA VE GÜNCELLEME / EKLEME (IMPORT) ───
     @Transactional
@@ -182,39 +184,42 @@ public class PersonelService {
         };
     }
 
-    // ─── 3. TEKLİ PERSONEL EKLEME VEYA GÜNCELLEME ───
+    // ─── YENİ: PERSONEL EKLEME (POST) ───
     @Transactional
-    public String kaydetVeyaGuncelle(Personel personel) {
-        // Gelen TCKN kontrolü
-        if (personel.getTckn() == null || personel.getTckn().length() != 11) {
-            throw new IllegalArgumentException("Hata: Geçersiz veya boş TCKN!");
+    public Personel personelEkle(Personel personel) {
+        // Departman kontrolü
+        if (personel.getDepartman() == null || personel.getDepartman().getId() == null) {
+            throw new IllegalArgumentException("Departman ID eksik!");
         }
 
-        // "\\d+" ifadesi "sadece rakamlardan oluşmalıdır" demektir.
-        if (!personel.getTckn().matches("\\d+")) {
-            throw new IllegalArgumentException("Hata: TCKN sadece rakamlardan oluşmalıdır!");
+        Departman departman = departmanRepository.findById(personel.getDepartman().getId())
+                .orElseThrow(() -> new IllegalArgumentException("Geçersiz Departman ID!"));
+
+        personel.setDepartman(departman); // Doğrulanmış departmanı atıyoruz
+        return personelRepository.save(personel);
+    }
+
+    // ─── YENİ: PERSONEL GÜNCELLEME (PUT) ───
+    @Transactional
+    public Personel personelGuncelle(String id, Personel guncelBilgiler) {
+        Personel mevcutPersonel = personelRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Güncellenecek personel bulunamadı!"));
+
+        // Yeni departman atanmışsa doğrula ve güncelle
+        if (guncelBilgiler.getDepartman() != null && guncelBilgiler.getDepartman().getId() != null) {
+            Departman yeniDepartman = departmanRepository.findById(guncelBilgiler.getDepartman().getId())
+                    .orElseThrow(() -> new IllegalArgumentException("Atanmak istenen yeni departman bulunamadı!"));
+            mevcutPersonel.setDepartman(yeniDepartman);
         }
 
-        // Veritabanında bu TCKN var mı kontrol et
-        Optional<Personel> mevcutPersonelOpt = personelRepository.findByTckn(personel.getTckn());
+        // Diğer bilgileri güncelle
+        mevcutPersonel.setAd(guncelBilgiler.getAd());
+        mevcutPersonel.setSoyad(guncelBilgiler.getSoyad());
+        mevcutPersonel.setTelefon(guncelBilgiler.getTelefon());
+        mevcutPersonel.setYas(guncelBilgiler.getYas());
+        mevcutPersonel.setMaas(guncelBilgiler.getMaas());
 
-        if (mevcutPersonelOpt.isPresent()) {
-            // VARSA: Mevcut kaydı çekip güncelle
-            Personel mevcutPersonel = mevcutPersonelOpt.get();
-            mevcutPersonel.setAd(personel.getAd());
-            mevcutPersonel.setSoyad(personel.getSoyad());
-            mevcutPersonel.setTelefon(personel.getTelefon());
-            mevcutPersonel.setYas(personel.getYas());
-            mevcutPersonel.setMaas(personel.getMaas());
-            mevcutPersonel.setIseGirisTarihi(personel.getIseGirisTarihi());
-
-            personelRepository.save(mevcutPersonel);
-            return "com.example.personellistesi.com.example.personellistesi.model.Personel başarıyla güncellendi. (TCKN: " + personel.getTckn() + ")";
-        } else {
-            // YOKSA: Sıfırdan yeni personel olarak kaydet (UUID otomatik üretilecek)
-            personelRepository.save(personel);
-            return "Yeni personel başarıyla eklendi. (TCKN: " + personel.getTckn() + ")";
-        }
+        return personelRepository.save(mevcutPersonel);
     }
 
     // ─── TÜM PERSONELLERİ LİSTELEME SERVİSİ ───
@@ -227,6 +232,4 @@ public class PersonelService {
     public void idIleSil(String id) {
         personelRepository.deleteById(id);
     }
-
-
 }
