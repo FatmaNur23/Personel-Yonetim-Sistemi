@@ -1,5 +1,7 @@
 // API Adresi
 const API_BASE_URL = 'http://localhost:8080/api/personeller';
+const DEPARTMAN_API_URL = 'http://localhost:8080/api/departmanlar';
+
 
 // Sayfalar (Bölümler)
 const homePage = document.getElementById('homePage');
@@ -67,6 +69,24 @@ function tumPersonelleriGetir() {
         });
 }
 
+
+// ─── DEPARTMANLARI BACKEND'DEN ÇEK VE KUTULARA DOLDUR ───
+function departmanlariGetir() {
+    fetch(DEPARTMAN_API_URL)
+        .then(res => res.json())
+        .then(data => {
+            let optionsHTML = '<option value="">-- Lütfen Departman Seçin --</option>';
+            data.forEach(d => {
+                optionsHTML += `<option value="${d.id}">${d.ad}</option>`;
+            });
+            // Hem ekleme hem de güncelleme formundaki select kutularını doldur
+            document.getElementById('departman_id').innerHTML = optionsHTML;
+            document.getElementById('update-departman_id').innerHTML = optionsHTML;
+        })
+        .catch(err => console.error("Departmanlar çekilemedi:", err));
+}
+
+
 // ─── TABLOYU DOLDURMA ───
 function personelTablosunuDoldur(personeller) {
     personelTableBody.innerHTML = '';
@@ -92,7 +112,7 @@ function personelTablosunuDoldur(personeller) {
     <td>${p.tckn}</td>
     <td>${p.ad}</td>
     <td>${p.soyad}</td>
-    <td><strong>${departmanAdi}</strong></td>
+    <td>${departmanAdi}</td>
     <td>${p.telefon || '-'}</td>
     <td>${sonGuncelleme}</td>
 `;
@@ -124,6 +144,8 @@ function detaySayfasiAc(id) {
     document.getElementById('detay-tckn').textContent = p.tckn;
     document.getElementById('detay-ad').textContent = p.ad;
     document.getElementById('detay-soyad').textContent = p.soyad;
+    const departmanAdi = (p.departman && p.departman.ad) ? p.departman.ad : 'Atanmamış';
+    document.getElementById('detay-departman').textContent = departmanAdi;
     document.getElementById('detay-yas').textContent = p.yas || '-';
     document.getElementById('detay-telefon').textContent = p.telefon || '-';
     document.getElementById('detay-maas').textContent = p.maas ? `${p.maas} ₺` : '-';
@@ -160,6 +182,12 @@ document.getElementById('menuGuncelle').addEventListener('click', () => {
     document.getElementById('update-yas').value = p.yas || '';
     document.getElementById('update-maas').value = p.maas || '';
     document.getElementById('update-iseGiris').value = p.iseGirisTarihi || '';
+    // YENİ: Personelin mevcut departmanı varsa onu seçili hale getir
+    if (p.departman && p.departman.id) {
+        document.getElementById('update-departman_id').value = p.departman.id;
+    } else {
+        document.getElementById('update-departman_id').value = '';
+    }
 
     showView(updatePage);
 });
@@ -191,20 +219,24 @@ document.getElementById('menuSil').addEventListener('click', () => {
 updateForm.addEventListener('submit', (e) => {
     e.preventDefault();
 
+    const personelId = document.getElementById('update-id').value;
+
     const data = {
-        id: document.getElementById('update-id').value,
         tckn: document.getElementById('update-tckn').value,
         ad: document.getElementById('update-ad').value,
         soyad: document.getElementById('update-soyad').value,
         telefon: document.getElementById('update-telefon').value || null,
         yas: document.getElementById('update-yas').value ? parseInt(document.getElementById('update-yas').value) : null,
         maas: document.getElementById('update-maas').value ? parseFloat(document.getElementById('update-maas').value) : null,
-        iseGirisTarihi: document.getElementById('update-iseGiris').value
+        iseGirisTarihi: document.getElementById('update-iseGiris').value,
+        departman: {
+            id: parseInt(document.getElementById('update-departman_id').value)
+        }
     };
 
     // Güncelleme için de backend'deki /kaydet POST ucunu kullanıyoruz (çünkü kodunuzda TCKN varsa güncelliyor)
-    fetch(`${API_BASE_URL}/kaydet`, {
-        method: 'POST',
+    fetch(`${API_BASE_URL}/${personelId}`, {
+        method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
     })
@@ -240,10 +272,13 @@ personelForm.addEventListener('submit', (e) => {
         telefon: document.getElementById('telefon').value || null,
         yas: document.getElementById('yas').value ? parseInt(document.getElementById('yas').value) : null,
         maas: document.getElementById('maas').value ? parseFloat(document.getElementById('maas').value) : null,
-        iseGirisTarihi: document.getElementById('iseGirisTarihi').value
+        iseGirisTarihi: document.getElementById('iseGirisTarihi').value,
+        departman: {
+            id: parseInt(document.getElementById('departman_id').value)
+        }
     };
 
-    fetch(`${API_BASE_URL}/kaydet`, {
+    fetch(`${API_BASE_URL}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
@@ -339,5 +374,7 @@ themeToggleBtn.addEventListener('click', () => {
 // Sayfa ilk açıldığında verileri veritabanından çekelim
 document.addEventListener('DOMContentLoaded', () => {
     tumPersonelleriGetir();
+    departmanlariGetir(); // YENİ: Sayfa açılır açılmaz departmanları da çek
 });
+
 

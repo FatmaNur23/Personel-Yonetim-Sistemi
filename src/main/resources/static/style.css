@@ -230,7 +230,7 @@ label {
     margin-bottom: 5px;
 }
 
-input {
+input,select{
     padding: 10px;
     border: 1px solid var(--border-color);
     border-radius: 6px;
@@ -239,6 +239,7 @@ input {
     color: var(--text-color);
     outline: none;
     transition: all 0.2s;
+    height: 42px;
 }
 
 input:focus {
