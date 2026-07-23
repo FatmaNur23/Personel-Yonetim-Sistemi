@@ -109,7 +109,7 @@
             <form id="updateForm" class="grid-form">
                 <input type="hidden" id="update-id">
 
-                <div class="form-group full-width">
+                <div class="form-group">
                     <label>TCKN (Güncellenemez):</label>
                     <input type="text" id="update-tckn" readonly class="readonly-input">
                 </div>
@@ -129,6 +129,15 @@
                     <input type="text" id="update-telefon">
                 </div>
 
+                <!-- YENİ EKLENEN: GÜNCELLEME İÇİN DEPARTMAN SEÇİMİ -->
+                <div class="form-group full-width">
+                    <label for="update-departman_id">Departman:</label>
+                    <select id="update-departman_id" required style="padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; background-color: var(--input-bg); color: var(--text-color);">
+                        <option value="">-- Departman Yükleniyor --</option>
+                    </select>
+                </div>
+
+
                 <div class="form-group">
                     <label for="update-yas">Yaş:</label>
                     <input type="number" id="update-yas" min="18" max="100">
@@ -139,7 +148,7 @@
                     <input type="number" step="0.01" id="update-maas">
                 </div>
 
-                <div class="form-group">
+                <div class="form-group full-width">
                     <label for="update-iseGiris">İşe Giriş Tarihi:</label>
                     <input type="date" id="update-iseGiris" required>
                 </div>
@@ -179,6 +188,15 @@
                     <label for="telefon">Telefon:</label>
                     <input type="text" id="telefon" placeholder="05001234567">
                 </div>
+
+                <!-- YENİ EKLENEN: EKLEME İÇİN DEPARTMAN SEÇİMİ -->
+                <div class="form-group full-width">
+                    <label for="departman_id">Departman:</label>
+                    <select id="departman_id" required style="padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; background-color: var(--input-bg); color: var(--text-color);">
+                        <option value="">-- Departman Yükleniyor --</option>
+                    </select>
+                </div>
+
 
                 <div class="form-group">
                     <label for="yas">Yaş:</label>
