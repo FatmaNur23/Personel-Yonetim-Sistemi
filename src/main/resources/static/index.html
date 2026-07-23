@@ -221,10 +221,57 @@
     </section>
 </div>
 
+
+<!-- ========================================== -->
+<!-- 🌴 BÖLÜM 5: İZİN EKLEME SAYFASI            -->
+<!-- ========================================== -->
+<section id="leavePage" class="view-section hidden">
+    <button class="btn btn-secondary btn-back">⬅ Vazgeç ve Geri Dön</button>
+
+    <div class="card">
+        <h2>🌴 Personel İzni Ekle (<span id="izin-personel-isim" style="color: var(--primary-color);"></span>)</h2>
+        <form id="leaveForm" class="grid-form">
+
+            <div class="form-group">
+                <label for="izin-baslangic">Başlangıç Tarihi:</label>
+                <input type="date" id="izin-baslangic" required>
+            </div>
+
+            <div class="form-group">
+                <label for="izin-bitis">Bitiş Tarihi:</label>
+                <input type="date" id="izin-bitis" required>
+            </div>
+
+            <div class="form-group full-width">
+                <label for="izin-turu">İzin Türü:</label>
+                <select id="izin-turu" required>
+                    <option value="">-- İzin Türü Seçin --</option>
+                    <option value="Yıllık İzin">Yıllık İzin</option>
+                    <option value="Mazeret İzni">Mazeret İzni</option>
+                    <option value="Hastalık İzni">Hastalık İzni</option>
+                    <option value="Ücretsiz İzin">Ücretsiz İzin</option>
+                </select>
+            </div>
+
+            <div class="form-group full-width">
+                <label for="izin-aciklamasi">Açıklama (İsteğe Bağlı):</label>
+                <input type="text" id="izin-aciklamasi" placeholder="Örn: Yıllık memleket ziyareti...">
+            </div>
+
+            <div class="form-group full-width">
+                <button type="submit" class="btn btn-block btn-primary">💾 İzni Kaydet</button>
+            </div>
+        </form>
+    </div>
+</section>
+
+
+
 <!-- 🌐 ÖZEL SAĞ TIK MENÜSÜ (CONTEXT MENU) -->
 <div id="customContextMenu" class="context-menu hidden">
     <ul>
         <li id="menuGuncelle">✏️ Güncelle</li>
+        <li id="menuIzin">🌴 İzin Ekle</li>
         <li id="menuSil" class="menu-danger">❌ Sil</li>
     </ul>
 </div>
