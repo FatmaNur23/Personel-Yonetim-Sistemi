@@ -1,6 +1,7 @@
 // API Adresi
 const API_BASE_URL = 'http://localhost:8080/api/personeller';
 const DEPARTMAN_API_URL = 'http://localhost:8080/api/departmanlar';
+const IZIN_TURU_API_URL = 'http://localhost:8080/api/izin-turleri';
 
 
 // Sayfalar (Bölümler)
@@ -87,6 +88,21 @@ function departmanlariGetir() {
             document.getElementById('update-departman_id').innerHTML = optionsHTML;
         })
         .catch(err => console.error("Departmanlar çekilemedi:", err));
+}
+
+
+// ─── İZİN TÜRLERİNİ BACKEND'DEN ÇEK ───
+function izinTurleriniGetir() {
+    fetch(IZIN_TURU_API_URL)
+        .then(res => res.json())
+        .then(data => {
+            let optionsHTML = '<option value="">-- İzin Türü Seçin --</option>';
+            data.forEach(d => {
+                optionsHTML += `<option value="${d.id}">${d.ad}</option>`;
+            });
+            document.getElementById('izin-turu').innerHTML = optionsHTML;
+        })
+        .catch(err => console.error("İzin türleri çekilemedi:", err));
 }
 
 
@@ -333,7 +349,9 @@ leaveForm.addEventListener('submit', (e) => {
     const data = {
         baslangicTarihi: baslangic,
         bitisTarihi: bitis,
-        izinTuru: tur,
+        izinTuru: {
+            id: document.getElementById('izin-turu').value
+        },
         izinAciklamasi: document.getElementById('izin-aciklamasi').value || null,
         personel: {
             id: selectedPersonelId // Sağ tıklanan personelin ID'sini yolluyoruz
@@ -438,7 +456,8 @@ themeToggleBtn.addEventListener('click', () => {
 // Sayfa ilk açıldığında verileri veritabanından çekelim
 document.addEventListener('DOMContentLoaded', () => {
     tumPersonelleriGetir();
-    departmanlariGetir(); // YENİ: Sayfa açılır açılmaz departmanları da çek
+    departmanlariGetir();
+    izinTurleriniGetir();
 });
 
 

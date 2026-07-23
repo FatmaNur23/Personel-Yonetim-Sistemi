@@ -65,7 +65,7 @@ public class IzinService {
 
     // ─── ORTAK VALİDASYON METODU ───
     private void validasyonlariKontrolEt(Izin izin) {
-        if (izin.getIzinTuru() == null || izin.getIzinTuru().trim().isEmpty()) {
+        if (izin.getIzinTuru() == null || izin.getIzinTuru().getId() == null) {
             throw new IllegalArgumentException("Hata: İzin türü boş bırakılamaz!");
         }
         if (izin.getBaslangicTarihi() == null || izin.getBitisTarihi() == null) {

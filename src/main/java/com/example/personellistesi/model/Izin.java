@@ -13,7 +13,10 @@ public class Izin {
 
     private LocalDate baslangicTarihi;
     private LocalDate bitisTarihi;
-    private String izinTuru;
+
+    @ManyToOne
+    @JoinColumn(name = "izin_turu_id")
+    private IzinTuru izinTuru;
 
     // Birden fazla izin tek bir personele ait olabilir
     @ManyToOne(fetch = FetchType.LAZY)
@@ -32,9 +35,13 @@ public class Izin {
     public LocalDate getBitisTarihi() { return bitisTarihi; }
     public void setBitisTarihi(LocalDate bitisTarihi) { this.bitisTarihi = bitisTarihi; }
 
-    public String getIzinTuru() { return izinTuru; }
-    public void setIzinTuru(String izinTuru) { this.izinTuru = izinTuru; }
-
     public Personel getPersonel() { return personel; }
     public void setPersonel(Personel personel) { this.personel = personel; }
+
+    public IzinTuru getIzinTuru(){return izinTuru;}
+
+
+    public void setIzinTuru(IzinTuru izinTuru) {
+        this.izinTuru = izinTuru;
+    }
 }
