@@ -1,5 +1,6 @@
 package com.example.personellistesi.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;
@@ -17,6 +18,7 @@ public class Departman {
 
     // Bir departmanda birden fazla personel bulunabilir
     @OneToMany(mappedBy = "departman", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<Personel> personeller;
 
     // Constructor, Getter ve Setter Metotları

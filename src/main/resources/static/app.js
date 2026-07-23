@@ -1,5 +1,5 @@
 // API Adresi
-const API_BASE_URL = '/api/personeller';
+const API_BASE_URL = 'http://localhost:8080/api/personeller';
 
 // Sayfalar (Bölümler)
 const homePage = document.getElementById('homePage');
@@ -72,7 +72,7 @@ function personelTablosunuDoldur(personeller) {
     personelTableBody.innerHTML = '';
 
     if (personeller.length === 0) {
-        personelTableBody.innerHTML = '<tr><td colspan="5" style="text-align: center;">Kayıtlı personel bulunamadı.</td></tr>';
+        personelTableBody.innerHTML = '<tr><td colspan="6" style="text-align: center;">Kayıtlı personel bulunamadı.</td></tr>';
         return;
     }
 
@@ -83,10 +83,16 @@ function personelTablosunuDoldur(personeller) {
         // Tarih formatı düzenleme
         const sonGuncelleme = p.kartSonGuncelleme ? new Date(p.kartSonGuncelleme).toLocaleString('tr-TR') : '-';
 
+        //Departman kontrolü (Güvenli zincirleme kontrolü)
+        // Eğer personel'in departmanı varsa ve departmanın adı varsa onu yaz, yoksa "Atanmamış" yaz.
+        const departmanAdi = (p.departman && p.departman.ad) ? p.departman.ad : '<i>Atanmamış</i>';
+
+
         tr.innerHTML = `
     <td>${p.tckn}</td>
     <td>${p.ad}</td>
     <td>${p.soyad}</td>
+    <td><strong>${departmanAdi}</strong></td>
     <td>${p.telefon || '-'}</td>
     <td>${sonGuncelleme}</td>
 `;
