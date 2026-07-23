@@ -11,16 +11,11 @@ import java.util.List;
 
 @Service
 public class IzinService {
-
     @Autowired
     private IzinRepository izinRepository;
+
     @Autowired
     private PersonelRepository personelRepository;
-
-    public IzinService(IzinRepository izinRepository, PersonelRepository personelRepository) {
-        this.izinRepository = izinRepository;
-        this.personelRepository = personelRepository;
-    }
 
     // ─── 1. YENİ İZİN EKLEME ───
     @Transactional

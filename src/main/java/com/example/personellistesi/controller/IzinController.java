@@ -13,13 +13,8 @@ import java.util.List;
 @RequestMapping("/api")
 @CrossOrigin(origins = "*")
 public class IzinController {
-
     @Autowired
     private IzinService izinService;
-
-    public IzinController(IzinService izinService) {
-        this.izinService = izinService;
-    }
 
     // POST /api/izinler — Yeni izin ekleme
     @PostMapping("/izinler")
