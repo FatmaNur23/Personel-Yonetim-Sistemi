@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api")
@@ -20,6 +21,7 @@ public class IzinController {
     @PostMapping("/izinler")
     public ResponseEntity<?> izinEkle(@RequestBody Izin izin) {
         try {
+            izin.setId(UUID.randomUUID().toString());
             Izin kaydedilenIzin = izinService.izinEkle(izin);
             return ResponseEntity.ok(kaydedilenIzin);
         } catch (IllegalArgumentException e) {

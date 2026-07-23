@@ -1,6 +1,7 @@
 // API Adresi
 const API_BASE_URL = 'http://localhost:8080/api/personeller';
 const DEPARTMAN_API_URL = 'http://localhost:8080/api/departmanlar';
+const IZIN_TURU_API_URL = 'http://localhost:8080/api/izin-turleri';
 
 
 // Sayfalar (Bölümler)
@@ -8,6 +9,7 @@ const homePage = document.getElementById('homePage');
 const detailPage = document.getElementById('detailPage');
 const updatePage = document.getElementById('updatePage');
 const addPage = document.getElementById('addPage');
+const leavePage = document.getElementById('leavePage');
 
 // Elemanlar
 const personelTableBody = document.getElementById('personelTableBody');
@@ -23,6 +25,8 @@ const btnExcelIndir = document.getElementById('btnExcelIndir');
 // Formlar
 const personelForm = document.getElementById('personelForm');
 const updateForm = document.getElementById('updateForm');
+const leaveForm = document.getElementById('leaveForm');
+const IZIN_API_URL = 'http://localhost:8080/api/izinler';
 
 // Hafızada tutulacak geçici değişkenler
 let selectedPersonelId = null;
@@ -30,7 +34,7 @@ let activePersonelData = []; // Tüm personellerin listesi buraya saklanacak
 
 // ─── SAYFA GEÇİŞ YÖNETİMİ (SPA) ───
 function showView(targetView) {
-    [homePage, detailPage, updatePage, addPage].forEach(view => {
+    [homePage, detailPage, updatePage, addPage,leavePage].forEach(view => {
         view.classList.add('hidden');
     });
     targetView.classList.remove('hidden');
@@ -84,6 +88,21 @@ function departmanlariGetir() {
             document.getElementById('update-departman_id').innerHTML = optionsHTML;
         })
         .catch(err => console.error("Departmanlar çekilemedi:", err));
+}
+
+
+// ─── İZİN TÜRLERİNİ BACKEND'DEN ÇEK ───
+function izinTurleriniGetir() {
+    fetch(IZIN_TURU_API_URL)
+        .then(res => res.json())
+        .then(data => {
+            let optionsHTML = '<option value="">-- İzin Türü Seçin --</option>';
+            data.forEach(d => {
+                optionsHTML += `<option value="${d.id}">${d.ad}</option>`;
+            });
+            document.getElementById('izin-turu').innerHTML = optionsHTML;
+        })
+        .catch(err => console.error("İzin türleri çekilemedi:", err));
 }
 
 
@@ -167,6 +186,21 @@ window.addEventListener('click', () => {
 });
 
 // ─── MENÜ EYLEMLERİ ───
+
+
+// İZİN EKLE Tıklanınca
+document.getElementById('menuIzin').addEventListener('click', () => {
+    const p = activePersonelData.find(item => item.id === selectedPersonelId);
+    if (!p) return;
+
+    // Hangi personele izin eklediğimizi başlıkta gösterelim
+    document.getElementById('izin-personel-isim').textContent = `${p.ad} ${p.soyad}`;
+
+    leaveForm.reset(); // Formu temizle
+    showView(leavePage); // İzin sayfasını aç
+});
+
+
 
 // GÜNCELLE Tıklanınca
 document.getElementById('menuGuncelle').addEventListener('click', () => {
@@ -297,6 +331,54 @@ personelForm.addEventListener('submit', (e) => {
         .catch(err => showMessage("Kayıt sırasında bağlantı hatası oluştu!", false));
 });
 
+
+// ─── İZİN FORMU KAYDETME (POST) VE VALİDASYON ───
+leaveForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+
+    const baslangic = document.getElementById('izin-baslangic').value;
+    const bitis = document.getElementById('izin-bitis').value;
+    const tur = document.getElementById('izin-turu').value;
+
+    // 🔍 TARİH VALİDASYONU: Bitiş tarihi başlangıçtan önce olamaz!
+    if (new Date(bitis) < new Date(baslangic)) {
+        showMessage('Hata: Bitiş tarihi, başlangıç tarihinden önce olamaz!', false);
+        return; // İşlemi durdur
+    }
+
+    const data = {
+        baslangicTarihi: baslangic,
+        bitisTarihi: bitis,
+        izinTuru: {
+            id: document.getElementById('izin-turu').value
+        },
+        izinAciklamasi: document.getElementById('izin-aciklamasi').value || null,
+        personel: {
+            id: selectedPersonelId // Sağ tıklanan personelin ID'sini yolluyoruz
+        }
+    };
+
+    fetch(IZIN_API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+    })
+        .then(async res => {
+            if (res.ok) {
+                showMessage("İzin başarıyla eklendi!", true);
+                leaveForm.reset();
+                showView(homePage);
+            } else {
+                const text = await res.text();
+                showMessage("Hata: " + text, false);
+            }
+        })
+        .catch(err => showMessage("İzin kaydedilirken bağlantı hatası oluştu!", false));
+});
+
+
+
+
 // ─── GERİ DÖNÜŞ BUTONLARI (GLOBAL KONTROL) ───
 document.querySelectorAll('.btn-back').forEach(btn => {
     btn.addEventListener('click', () => {
@@ -374,7 +456,8 @@ themeToggleBtn.addEventListener('click', () => {
 // Sayfa ilk açıldığında verileri veritabanından çekelim
 document.addEventListener('DOMContentLoaded', () => {
     tumPersonelleriGetir();
-    departmanlariGetir(); // YENİ: Sayfa açılır açılmaz departmanları da çek
+    departmanlariGetir();
+    izinTurleriniGetir();
 });
 
 
