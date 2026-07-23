@@ -8,6 +8,7 @@ import java.time.LocalDate;
 public class Izin {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private String id;
 
     private LocalDate baslangicTarihi;
