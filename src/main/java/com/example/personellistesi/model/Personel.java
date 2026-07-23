@@ -11,9 +11,7 @@ import jakarta.validation.constraints.NotNull;
 @Entity
 @Table(name = "personeller")
 public class Personel {
-
     @Id
-    @Column(length = 64)
     private String id;
 
     @Column(length = 11, unique = true, nullable = false)

@@ -6,9 +6,7 @@ import java.time.LocalDate;
 @Entity
 @Table(name = "izin")
 public class Izin {
-
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private String id;
 
     private LocalDate baslangicTarihi;

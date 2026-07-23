@@ -8,7 +8,6 @@ import java.util.List;
 @Entity
 @Table(name = "departman")
 public class Departman {
-
     @Id
     private String id;
 
