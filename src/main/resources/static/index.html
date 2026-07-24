@@ -244,12 +244,8 @@
 
             <div class="form-group full-width">
                 <label for="izin-turu">İzin Türü:</label>
-                <select id="izin-turu" required>
-                    <option value="">-- İzin Türü Seçin --</option>
-                    <option value="Yıllık İzin">Yıllık İzin</option>
-                    <option value="Mazeret İzni">Mazeret İzni</option>
-                    <option value="Hastalık İzni">Hastalık İzni</option>
-                    <option value="Ücretsiz İzin">Ücretsiz İzin</option>
+                <select id="izin-turu" required style="padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; background-color: var(--input-bg); color: var(--text-color); height: 42px;">
+                    <option value="">-- Yükleniyor... --</option>
                 </select>
             </div>
 
@@ -267,11 +263,87 @@
 
 
 
+<!-- ========================================== -->
+<!-- 👀 BÖLÜM 6: İZİN LİSTESİ SAYFASI           -->
+<!-- ========================================== -->
+<section id="leaveListPage" class="view-section hidden">
+    <button class="btn btn-secondary btn-back" style="margin-bottom: 15px;">⬅ Geri Dön</button>
+
+    <div class="card" style="padding: 0; overflow: hidden;">
+        <div style="padding: 20px; border-bottom: 1px solid var(--border-color); background-color: var(--card-bg);">
+            <h2 style="margin: 0;">👀 Personel İzinleri (<span id="izin-liste-personel-isim" style="color: var(--primary-color);"></span>)</h2>
+        </div>
+
+        <!-- Ana sayfadaki tablo görünümünü veren taşıyıcı div -->
+        <div class="table-container" style="overflow-x: auto; padding: 20px;">
+            <table class="data-table" style="width: 100%; border-collapse: collapse; text-align: left;">
+                <thead>
+                <tr style="background-color: var(--context-bg); border-bottom: 2px solid var(--border-color);">
+                    <th style="padding: 12px 15px;">Başlangıç Tarihi</th>
+                    <th style="padding: 12px 15px;">Bitiş Tarihi</th>
+                    <th style="padding: 12px 15px;">İzin Türü</th>
+                    <th style="padding: 12px 15px;">Açıklama</th>
+                    <th style="padding: 12px 15px; text-align: center;">İşlemler</th>
+                </tr>
+                </thead>
+                <tbody id="izinListesiBody">
+                <!-- JS ile dinamik dolacak -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+
+
+<!-- ========================================== -->
+<!-- ✏️ BÖLÜM 7: İZİN GÜNCELLEME SAYFASI       -->
+<!-- ========================================== -->
+<section id="leaveUpdatePage" class="view-section hidden">
+    <button class="btn btn-secondary" id="btn-back-to-leave-list">⬅ İzin Listesine Dön</button>
+    <div class="card">
+        <h2>✏️ İzni Güncelle</h2>
+        <form id="leaveUpdateForm" class="grid-form">
+            <!-- Güncellenecek iznin ID'sini gizli tutuyoruz -->
+            <input type="hidden" id="guncelle-izin-id">
+
+            <div class="form-group">
+                <label for="guncelle-izin-baslangic">Başlangıç Tarihi:</label>
+                <input type="date" id="guncelle-izin-baslangic" required>
+            </div>
+
+            <div class="form-group">
+                <label for="guncelle-izin-bitis">Bitiş Tarihi:</label>
+                <input type="date" id="guncelle-izin-bitis" required>
+            </div>
+
+            <div class="form-group full-width">
+                <label for="guncelle-izin-turu">İzin Türü:</label>
+                <select id="guncelle-izin-turu" required style="padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; background-color: var(--input-bg); color: var(--text-color); height: 42px;">
+                    <!-- Seçenekler JS ile kopyalanacak -->
+                </select>
+            </div>
+
+            <div class="form-group full-width">
+                <label for="guncelle-izin-aciklamasi">Açıklama:</label>
+                <input type="text" id="guncelle-izin-aciklamasi">
+            </div>
+
+            <div class="form-group full-width">
+                <button type="submit" class="btn btn-block btn-primary">💾 Değişiklikleri Kaydet</button>
+            </div>
+        </form>
+    </div>
+</section>
+
+
+
+
 <!-- 🌐 ÖZEL SAĞ TIK MENÜSÜ (CONTEXT MENU) -->
 <div id="customContextMenu" class="context-menu hidden">
     <ul>
         <li id="menuGuncelle">✏️ Güncelle</li>
         <li id="menuIzin">🌴 İzin Ekle</li>
+        <li id="menuIzinListe">👀 İzinleri Göster</li>
         <li id="menuSil" class="menu-danger">❌ Sil</li>
     </ul>
 </div>
