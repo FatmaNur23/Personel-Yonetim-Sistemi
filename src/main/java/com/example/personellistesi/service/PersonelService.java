@@ -32,6 +32,8 @@ public class PersonelService {
         Set<String> excelIciTcknSet = new HashSet<>();
         List<String> mukerrerTcknler = new ArrayList<>();
 
+        int atlananDepartmanSayisi = 0;
+
         try (InputStream is = file.getInputStream(); Workbook workbook = new XSSFWorkbook(is)) {
             Sheet sheet = workbook.getSheetAt(0);
 
@@ -68,9 +70,28 @@ public class PersonelService {
                     personel.setMaas((float) row.getCell(5).getNumericCellValue());
                 }
 
+                //Departman
+                if (row.getCell(6) != null) {
+                    String departmanAdi = getCellValueAsString(row.getCell(6)).trim();
+
+                    if (!departmanAdi.isEmpty()) {
+                        // Veritabanında isme göre departman arıyoruz
+                        Optional<Departman> departmanOpt = departmanRepository.findByAd(departmanAdi);
+
+                        if (departmanOpt.isPresent()) {
+                            personel.setDepartman(departmanOpt.get());
+                        } else {
+                            // Eşleşmeyen departman durumunda satırı atlıyoruz
+                            atlananDepartmanSayisi++;
+                            continue; // Döngüyü burada kesip bir sonraki satıra geçer, personeli listeye eklemez
+                        }
+                    }
+                }
+
+
                 // İşe Giriş Tarihi
-                if (row.getCell(6) != null && DateUtil.isCellDateFormatted(row.getCell(6))) {
-                    Date date = row.getCell(6).getDateCellValue();
+                if (row.getCell(7) != null && DateUtil.isCellDateFormatted(row.getCell(6))) {
+                    Date date = row.getCell(7).getDateCellValue();
                     personel.setIseGirisTarihi(date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
                 } else {
                     throw new IllegalArgumentException("Hata: " + i + ". satırdaki tarih formatı hatalı!");
@@ -98,6 +119,7 @@ public class PersonelService {
                 mevcutPersonel.setTelefon(excelPersonel.getTelefon());
                 mevcutPersonel.setYas(excelPersonel.getYas());
                 mevcutPersonel.setMaas(excelPersonel.getMaas());
+                mevcutPersonel.setDepartman(excelPersonel.getDepartman());
                 mevcutPersonel.setIseGirisTarihi(excelPersonel.getIseGirisTarihi());
 
                 personelRepository.save(mevcutPersonel);
@@ -108,7 +130,6 @@ public class PersonelService {
                 eklenenSayisi++;
             }
         }
-
         return "İşlem Başarılı! " + eklenenSayisi + " personel eklendi, " + guncellenenSayisi + " personel güncellendi.";
     }
 
