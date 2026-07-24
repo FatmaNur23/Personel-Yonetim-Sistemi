@@ -122,7 +122,7 @@ public class PersonelService {
 
             // Başlık satırını tasarlıyoruz
             Row headerRow = sheet.createRow(0);
-            String[] headers = {"TCKN", "Ad", "Soyad", "Telefon", "Yaş", "Maaş", "İşe Giriş Tarihi"};
+            String[] headers = {"TCKN", "Ad", "Soyad", "Telefon", "Yaş", "Maaş","Departman", "İşe Giriş Tarihi"};
 
             // Başlıklar için kalın yazı tipi (Font) stili oluşturuyoruz
             CellStyle headerCellStyle = workbook.createCellStyle();
@@ -148,9 +148,19 @@ public class PersonelService {
                 row.createCell(3).setCellValue(personel.getTelefon() != null ? personel.getTelefon() : "");
                 row.createCell(4).setCellValue(personel.getYas() != null ? personel.getYas() : 0);
                 row.createCell(5).setCellValue(personel.getMaas() != null ? personel.getMaas() : 0.0);
+                row.createCell(6).setCellValue("Departman");
+
+
+
+                Cell departmanCell = row.createCell(6);
+                if (personel.getDepartman() != null && personel.getDepartman().getAd() != null) {
+                    departmanCell.setCellValue(personel.getDepartman().getAd());
+                } else {
+                    departmanCell.setCellValue("");
+                }
 
                 // Tarih hücresini formatlıyoruz
-                Cell dateCell = row.createCell(6);
+                Cell dateCell = row.createCell(7);
                 if (personel.getIseGirisTarihi() != null) {
                     dateCell.setCellValue(java.sql.Date.valueOf(personel.getIseGirisTarihi()));
 
@@ -218,6 +228,7 @@ public class PersonelService {
         mevcutPersonel.setTelefon(guncelBilgiler.getTelefon());
         mevcutPersonel.setYas(guncelBilgiler.getYas());
         mevcutPersonel.setMaas(guncelBilgiler.getMaas());
+        mevcutPersonel.setDepartman(guncelBilgiler.getDepartman());
 
         return personelRepository.save(mevcutPersonel);
     }
