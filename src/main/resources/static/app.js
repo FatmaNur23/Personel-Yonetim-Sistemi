@@ -10,12 +10,15 @@ const detailPage = document.getElementById('detailPage');
 const updatePage = document.getElementById('updatePage');
 const addPage = document.getElementById('addPage');
 const leavePage = document.getElementById('leavePage');
+const leaveListPage = document.getElementById('leaveListPage');
+const leaveUpdatePage = document.getElementById('leaveUpdatePage');
 
 // Elemanlar
 const personelTableBody = document.getElementById('personelTableBody');
 const statusMessage = document.getElementById('statusMessage');
 const customContextMenu = document.getElementById('customContextMenu');
 const themeToggleBtn = document.getElementById('themeToggle');
+const izinListesiBody = document.getElementById('izinListesiBody');
 
 // Excel Elemanları
 const excelFile = document.getElementById('excelFile');
@@ -26,15 +29,19 @@ const btnExcelIndir = document.getElementById('btnExcelIndir');
 const personelForm = document.getElementById('personelForm');
 const updateForm = document.getElementById('updateForm');
 const leaveForm = document.getElementById('leaveForm');
+const leaveUpdateForm = document.getElementById('leaveUpdateForm');
 const IZIN_API_URL = 'http://localhost:8080/api/izinler';
 
 // Hafızada tutulacak geçici değişkenler
 let selectedPersonelId = null;
 let activePersonelData = []; // Tüm personellerin listesi buraya saklanacak
 
+let currentLeavePersonelId = null; // İzin listesini yenilerken kimin listesi olduğunu hatırlamak için
+let currentIzinListData = []; // Silme ve Güncelleme için verileri hafızada tutarız
+
 // ─── SAYFA GEÇİŞ YÖNETİMİ (SPA) ───
 function showView(targetView) {
-    [homePage, detailPage, updatePage, addPage,leavePage].forEach(view => {
+    [homePage, detailPage, updatePage, addPage,leavePage, leaveListPage, leaveUpdatePage].forEach(view => {
         view.classList.add('hidden');
     });
     targetView.classList.remove('hidden');
@@ -117,6 +124,7 @@ function personelTablosunuDoldur(personeller) {
 
     personeller.forEach(p => {
         const tr = document.createElement('tr');
+        tr.style.borderBottom = "1px solid var(--border-color, #eee)";
         tr.dataset.id = p.id;
 
         // Tarih formatı düzenleme
@@ -249,6 +257,103 @@ document.getElementById('menuSil').addEventListener('click', () => {
     }
 });
 
+
+
+// ─── İZİNLERİ GÖSTER MENÜSÜNE TIKLANINCA ───
+document.getElementById('menuIzinListe').addEventListener('click', () => {
+    const p = activePersonelData.find(item => item.id === selectedPersonelId);
+    if (!p) return;
+
+    currentLeavePersonelId = p.id; // Personeli hafızaya al
+    document.getElementById('izin-liste-personel-isim').textContent = `${p.ad} ${p.soyad}`;
+
+    izinleriGetirVeCiz(currentLeavePersonelId);
+    showView(leaveListPage);
+});
+
+// GET /api/personeller/{id}/izinler İsteği
+function izinleriGetirVeCiz(personelId) {
+    fetch(`http://localhost:8080/api/personeller/${personelId}/izinler`)
+        .then(res => res.json())
+        .then(data => {
+            currentIzinListData = data; // Veriyi global hafızaya al (Düzenle butonu için lazım)
+            izinListesiBody.innerHTML = ''; // Tabloyu temizle
+
+            if (data.length === 0) {
+                izinListesiBody.innerHTML = '<tr><td colspan="5" style="text-align:center;">Bu personelin kayıtlı izni bulunmuyor.</td></tr>';
+                return;
+            }
+
+            data.forEach(izin => {
+                const turAdi = (izin.izinTuru && izin.izinTuru.ad) ? izin.izinTuru.ad : '-';
+                const aciklama = izin.izinAciklamasi || '-';
+
+                const tr = document.createElement('tr');
+
+
+                tr.innerHTML = `
+                    <td style="padding: 12px 15px;">${izin.baslangicTarihi}</td>
+                    <td style="padding: 12px 15px;">${izin.bitisTarihi}</td>
+                    <td style="padding: 12px 15px;">${turAdi}</td>
+                    <td style="padding: 12px 15px;">${aciklama}</td>
+                    <td style="padding: 12px 15px;">
+                        <button onclick="izinDuzenleEkraniniAc('${izin.id}')" class="btn btn-small" style="background-color: var(--primary-color); color: white; padding: 5px 10px; border-radius: 4px; border:none; cursor:pointer;">✏️ Düzenle</button>
+                        <button onclick="izinSil('${izin.id}')" class="btn btn-small" style="background-color: var(--danger-color); color: white; padding: 5px 10px; border-radius: 4px; border:none; cursor:pointer; margin-left: 5px;">❌ Sil</button>
+                    </td>
+                `;
+
+
+                izinListesiBody.appendChild(tr);
+            });
+        })
+        .catch(err => showMessage("İzinler getirilirken hata oluştu!", false));
+}
+
+
+
+// ─── İZİN SİLME İŞLEMİ ───
+window.izinSil = function(izinId) {
+    if (!confirm("Bu izin kaydını tamamen silmek istediğinize emin misiniz?")) return;
+
+    fetch(`http://localhost:8080/api/izinler/${izinId}`, {
+        method: 'DELETE'
+    })
+        .then(res => {
+            if (res.ok) {
+                showMessage("İzin başarıyla silindi!", true);
+                izinleriGetirVeCiz(currentLeavePersonelId); // Tabloyu anında yenile
+            } else {
+                showMessage("Silme işlemi başarısız oldu.", false);
+            }
+        })
+        .catch(err => showMessage("Sunucuya bağlanılamadı!", false));
+}
+
+// ─── İZİN DÜZENLE EKRANINI AÇMA ───
+window.izinDuzenleEkraniniAc = function(izinId) {
+    const izin = currentIzinListData.find(i => i.id === izinId);
+    if (!izin) return;
+
+    // Formu doldur
+    document.getElementById('guncelle-izin-id').value = izin.id;
+    document.getElementById('guncelle-izin-baslangic').value = izin.baslangicTarihi;
+    document.getElementById('guncelle-izin-bitis').value = izin.bitisTarihi;
+    document.getElementById('guncelle-izin-aciklamasi').value = izin.izinAciklamasi || '';
+
+    // İzin türleri menüsünü diğer formdan (izin-turu) birebir kopyalayıp içine koyuyoruz
+    const guncelleTurSelect = document.getElementById('guncelle-izin-turu');
+    guncelleTurSelect.innerHTML = document.getElementById('izin-turu').innerHTML;
+
+    if (izin.izinTuru && izin.izinTuru.id) {
+        guncelleTurSelect.value = izin.izinTuru.id;
+    }
+
+    showView(leaveUpdatePage);
+}
+
+
+
+
 // ─── GÜNCELLEME FORMU KAYDETME (SUBMIT) ───
 updateForm.addEventListener('submit', (e) => {
     e.preventDefault();
@@ -375,6 +480,59 @@ leaveForm.addEventListener('submit', (e) => {
         })
         .catch(err => showMessage("İzin kaydedilirken bağlantı hatası oluştu!", false));
 });
+
+
+
+
+// ─── İZİN GÜNCELLEME (PUT) VE VALİDASYON ───
+leaveUpdateForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+
+    const id = document.getElementById('guncelle-izin-id').value;
+    const baslangic = document.getElementById('guncelle-izin-baslangic').value;
+    const bitis = document.getElementById('guncelle-izin-bitis').value;
+
+    // Tarih validasyonu
+    if (new Date(bitis) < new Date(baslangic)) {
+        showMessage('Hata: Bitiş tarihi, başlangıç tarihinden önce olamaz!', false);
+        return;
+    }
+
+    const data = {
+        baslangicTarihi: baslangic,
+        bitisTarihi: bitis,
+        izinTuru: {
+            id: document.getElementById('guncelle-izin-turu').value
+        },
+        izinAciklamasi: document.getElementById('guncelle-izin-aciklamasi').value || null,
+        personel: {
+            id: currentLeavePersonelId // Hangi personele ait olduğu
+        }
+    };
+
+    fetch(`http://localhost:8080/api/izinler/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+    })
+        .then(async res => {
+            if (res.ok) {
+                showMessage("İzin başarıyla güncellendi!", true);
+                izinleriGetirVeCiz(currentLeavePersonelId); // Verileri yenile
+                showView(leaveListPage); // Listeye geri dön
+            } else {
+                const text = await res.text();
+                showMessage("Hata: " + text, false);
+            }
+        })
+        .catch(err => showMessage("Güncellenirken bağlantı hatası oluştu!", false));
+});
+
+// Güncelleme ekranından İzin Listesine geri dönme butonu
+document.getElementById('btn-back-to-leave-list').addEventListener('click', () => {
+    showView(leaveListPage);
+});
+
 
 
 
