@@ -25,6 +25,8 @@ public class PersonelService {
     @Autowired
     private DepartmanRepository departmanRepository;
 
+
+
     // ─── 1. EXCEL'DEN VERİ OKUMA VE GÜNCELLEME / EKLEME (IMPORT) ───
     @Transactional
     public String excelImport(MultipartFile file) throws Exception {
@@ -227,7 +229,13 @@ public class PersonelService {
                 .orElseThrow(() -> new IllegalArgumentException("Geçersiz Departman ID!"));
 
         personel.setDepartman(departman); // Doğrulanmış departmanı atıyoruz
-        return personelRepository.save(personel);
+
+        Personel kaydedilenPersonel = personelRepository.save(personel);
+
+
+        // 3. EKLENEN YER: Kaydedilen personeli geri döndürüyoruz
+        return kaydedilenPersonel;
+
     }
 
     // ─── YENİ: PERSONEL GÜNCELLEME (PUT) ───
@@ -264,4 +272,6 @@ public class PersonelService {
     public void idIleSil(String id) {
         personelRepository.deleteById(id);
     }
+
+
 }

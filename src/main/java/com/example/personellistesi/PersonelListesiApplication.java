@@ -1,6 +1,5 @@
 package com.example.personellistesi;
 
-import com.example.personellistesi.service.MailService;
 import jakarta.persistence.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -21,23 +20,14 @@ public class PersonelListesiApplication implements CommandLineRunner {
     @Autowired
     private MailService mailService;
 
+
     public static void main(String[] args) {
 
         SpringApplication.run(PersonelListesiApplication.class, args);
     }
 
-    @Override
-    public void run(String... args) throws Exception {
-        System.out.println("Mail testi tetikleniyor...");
 
-        // Alıcı kısmına geçici olarak kendi e-posta adresini yazarak test edebilirsin
-        mailService.personelHosgeldinMailiGonder(
-                "fatmanuryrdl@gmail.com",
-                "Fatma",
-                "Yazılım",
-                "2026-07-28"
-        );
-    }
+
 
 
 }
