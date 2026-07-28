@@ -35,4 +35,5 @@ public class MailService {
             System.err.println("Mail gönderim hatası: " + e.getMessage());
         }
     }
+
 }

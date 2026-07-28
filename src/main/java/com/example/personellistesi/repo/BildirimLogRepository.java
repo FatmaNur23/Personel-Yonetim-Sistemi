@@ -19,4 +19,5 @@ public interface BildirimLogRepository extends JpaRepository<BildirimLog, String
     // İstersen her ikisini aynı anda kullanarak da filtreleme yapabilirsin
     List<BildirimLog> findByToAddressAndSendTimeBetween(String toAddress, LocalDateTime startDate, LocalDateTime endDate);
 
+
 }

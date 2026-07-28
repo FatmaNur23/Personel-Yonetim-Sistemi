@@ -28,6 +28,7 @@ public class BildirimLogService implements IBildirimLogService {
                 .orElseThrow(() -> new IllegalArgumentException("Hata: " + id + " numaralı log bulunamadı!"));
     }
 
+
     @Override
     public List<BildirimLog> getAllLogs() {
         return bildirimLogRepository.findAll();

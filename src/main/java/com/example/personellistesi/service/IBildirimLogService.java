@@ -16,4 +16,5 @@ public interface IBildirimLogService {
 
     // Alıcı e-posta adresine göre listelemek için
     List<BildirimLog> getLogsByToAddress(String toAddress);
+
 }
