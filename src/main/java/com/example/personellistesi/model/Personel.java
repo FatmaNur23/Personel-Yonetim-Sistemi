@@ -82,7 +82,6 @@ public class Personel {
     @JsonIgnore // JSON dönüşünde sonsuz döngüye (Infinite Loop) girmemesi için
     private List<Izin> izinler;
 
-    // ─── YENİ GETTER VE SETTER METOTLARI ───
 
     public Departman getDepartman() { return departman; }
     public void setDepartman(Departman departman) { this.departman = departman; }
