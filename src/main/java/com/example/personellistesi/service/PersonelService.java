@@ -1,5 +1,6 @@
 package com.example.personellistesi.service;
 
+import com.example.personellistesi.model.BildirimLog;
 import com.example.personellistesi.model.Departman;
 import com.example.personellistesi.model.Personel;
 import com.example.personellistesi.repo.DepartmanRepository;
@@ -24,6 +25,9 @@ public class PersonelService {
 
     @Autowired
     private DepartmanRepository departmanRepository;
+
+    @Autowired
+    private IBildirimLogService bildirimLogService;
 
 
 
@@ -231,6 +235,18 @@ public class PersonelService {
         personel.setDepartman(departman); // Doğrulanmış departmanı atıyoruz
 
         Personel kaydedilenPersonel = personelRepository.save(personel);
+
+        String ornekMail = kaydedilenPersonel.getAd().toLowerCase() + "." +
+                kaydedilenPersonel.getSoyad().toLowerCase() + "@sirket.com";
+
+        BildirimLog yeniLog = new BildirimLog(
+                "Yeni Personel Kaydı Başarılı",
+                "Sayın " + kaydedilenPersonel.getAd() + " " + kaydedilenPersonel.getSoyad() +
+                        ", sistemimize başarıyla eklendiniz.",
+                ornekMail
+        );
+
+        bildirimLogService.saveLog(yeniLog);
 
 
         // 3. EKLENEN YER: Kaydedilen personeli geri döndürüyoruz
