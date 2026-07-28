@@ -1,4 +1,5 @@
 package com.example.personellistesi;
+
 import jakarta.persistence.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -14,13 +15,17 @@ import java.util.UUID;
 @SpringBootApplication
 @EnableJpaRepositories(basePackages = "com.example.personellistesi.repo")
 @EntityScan(basePackages = "com.example.personellistesi.*")
-public class PersonelListesiApplication {
+public class PersonelListesiApplication implements CommandLineRunner {
+
+    @Autowired
+    private MailService mailService;
 
 
     public static void main(String[] args) {
 
         SpringApplication.run(PersonelListesiApplication.class, args);
     }
+
 
 
 
