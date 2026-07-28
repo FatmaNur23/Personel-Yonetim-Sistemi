@@ -56,12 +56,6 @@
             <artifactId>spring-boot-starter-mail</artifactId>
         </dependency>
 
-        <!-- Thymeleaf (HTML E-posta Şablonları İçin) -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-thymeleaf</artifactId>
-        </dependency>
-
 
         <dependency>
             <groupId>org.apache.poi</groupId>

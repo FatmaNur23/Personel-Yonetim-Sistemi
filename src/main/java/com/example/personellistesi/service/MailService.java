@@ -1,47 +1,37 @@
 package com.example.personellistesi.service;
 
-import jakarta.mail.MessagingException;
-import jakarta.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
-import org.thymeleaf.TemplateEngine;
-import org.thymeleaf.context.Context;
 
 @Service
 public class MailService {
 
     @Autowired
-    private JavaMailSender mailSender;
+    private  JavaMailSender mailSender;
 
-    @Autowired
-    private TemplateEngine templateEngine;
+    public  void personelHosgeldinMailiGonder(String aliciMail, String personelAd, String departmanAd, String iseGirisTarihi) {
 
-    public void personelHosgeldinMailiGonder(String aliciMail, String personelAd, String departmanAd, String iseGirisTarihi) {
+        // 1. Mail içeriğini doğrudan String olarak oluşturuyoruz ( \n ile alt satıra geçilir )
+        String mesajIcerigi = "Merhaba " + personelAd + ",\n\n"
+                + "Şirketimize ve Personel Yönetim Sistemimize hoş geldin! Kaydın başarıyla oluşturuldu.\n\n"
+                + "Departman: " + (departmanAd != null ? departmanAd : "Belirtilmedi") + "\n"
+                + "İşe Giriş Tarihi: " + iseGirisTarihi + "\n\n"
+                + "İyi çalışmalar dileriz.";
+
+        // 2. Basit mail nesnesini oluşturma
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setFrom("fatmanur2328@gmail.com");
+        message.setTo(aliciMail);
+        message.setSubject("Aramıza Hoş Geldiniz!");
+        message.setText(mesajIcerigi);
+
+        // 3. Maili Gönderme
         try {
-            // 1. Thymeleaf Context (Değişkenleri hazırlama)
-            Context context = new Context();
-            context.setVariable("personelAd", personelAd);
-            context.setVariable("departmanAd", departmanAd);
-            context.setVariable("iseGiris", iseGirisTarihi);
-
-            // 2. HTML Şablonunu işleme
-            String htmlIcerik = templateEngine.process("hosgeldin-mail", context);
-
-            // 3. Mail nesnesini oluşturma
-            MimeMessage message = mailSender.createMimeMessage();
-            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
-
-            helper.setTo(aliciMail);
-            helper.setSubject("Aramıza Hoş Geldiniz!");
-            helper.setText(htmlIcerik, true); // true parametresi mailin HTML olduğunu belirtir
-
-            // 4. Maili Gönderme
             mailSender.send(message);
             System.out.println("Mail başarıyla gönderildi: " + aliciMail);
-
-        } catch (MessagingException e) {
+        } catch (Exception e) {
             System.err.println("Mail gönderim hatası: " + e.getMessage());
         }
     }
