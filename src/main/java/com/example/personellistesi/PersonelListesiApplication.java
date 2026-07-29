@@ -15,12 +15,7 @@ import java.util.UUID;
 @SpringBootApplication
 @EnableJpaRepositories(basePackages = "com.example.personellistesi.repo")
 @EntityScan(basePackages = "com.example.personellistesi.*")
-public class PersonelListesiApplication implements CommandLineRunner {
-
-    @Autowired
-    private MailService mailService;
-
-
+public class PersonelListesiApplication {
     public static void main(String[] args) {
 
         SpringApplication.run(PersonelListesiApplication.class, args);

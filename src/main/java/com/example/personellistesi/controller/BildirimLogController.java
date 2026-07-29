@@ -14,7 +14,7 @@ import java.util.List;
 @CrossOrigin(origins = "*") // CORS hatası almamak için
 public class BildirimLogController {
 
-    private final IBildirimLogService bildirimLogService;
+    private  IBildirimLogService bildirimLogService;
 
     // Dependency Injection doğrudan Interface üzerinden yapılıyor
     @Autowired
@@ -22,7 +22,7 @@ public class BildirimLogController {
         this.bildirimLogService = bildirimLogService;
     }
 
-    // ─── GET API: Tüm Bildirim Loglarını Listeler (Önyüzdeki tablo için) ───
+    // ─── GET API: Tüm Bildirim Loglarını Listeler (Önyüzdeki tablo için)
     @GetMapping
     public ResponseEntity<List<BildirimLog>> tumLoglariListele() {
         try {
@@ -33,7 +33,7 @@ public class BildirimLogController {
         }
     }
 
-    // ─── GET API: ID'ye göre tekil log getirir ───
+    // ─── GET API: ID'ye göre tekil log getirir
     @GetMapping("/{id}")
     public ResponseEntity<?> idIleGetir(@PathVariable String id) {
         try {
@@ -44,7 +44,7 @@ public class BildirimLogController {
         }
     }
 
-    // ─── GET API: Belirli bir e-posta adresine giden logları filtreler ───
+    // ─── GET API: Belirli bir e-posta adresine giden logları filtreler
     // Örnek kullanım: /api/bildirim-loglari/alici?email=ahmet@ornek.com
     @GetMapping("/alici")
     public ResponseEntity<List<BildirimLog>> aliciyaGoreFiltrele(@RequestParam("email") String toAddress) {
@@ -56,7 +56,7 @@ public class BildirimLogController {
         }
     }
 
-    // ─── POST API: Manuel olarak log ekleme (Postman vs. ile test etmek istersen) ───
+    // ─── POST API: Manuel olarak log ekleme
     @PostMapping
     public ResponseEntity<?> logEkle(@RequestBody BildirimLog bildirimLog) {
         try {

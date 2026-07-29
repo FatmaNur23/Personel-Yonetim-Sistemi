@@ -140,6 +140,7 @@ function personelTablosunuDoldur(personeller) {
     <td>${p.ad}</td>
     <td>${p.soyad}</td>
     <td>${departmanAdi}</td>
+    <td>${p.email || '-'}</td>
     <td>${p.telefon || '-'}</td>
     <td>${sonGuncelleme}</td>
 `;
@@ -173,6 +174,7 @@ function detaySayfasiAc(id) {
     document.getElementById('detay-soyad').textContent = p.soyad;
     const departmanAdi = (p.departman && p.departman.ad) ? p.departman.ad : 'Atanmamış';
     document.getElementById('detay-departman').textContent = departmanAdi;
+    document.getElementById('detay-email').textContent = p.email || '-';
     document.getElementById('detay-yas').textContent = p.yas || '-';
     document.getElementById('detay-telefon').textContent = p.telefon || '-';
     document.getElementById('detay-maas').textContent = p.maas ? `${p.maas} ₺` : '-';
@@ -220,6 +222,7 @@ document.getElementById('menuGuncelle').addEventListener('click', () => {
     document.getElementById('update-tckn').value = p.tckn;
     document.getElementById('update-ad').value = p.ad;
     document.getElementById('update-soyad').value = p.soyad;
+    document.getElementById('update-email').value = p.email || '';
     document.getElementById('update-telefon').value = p.telefon || '';
     document.getElementById('update-yas').value = p.yas || '';
     document.getElementById('update-maas').value = p.maas || '';
@@ -360,10 +363,18 @@ updateForm.addEventListener('submit', (e) => {
 
     const personelId = document.getElementById('update-id').value;
 
+    const emailVal = document.getElementById('update-email').value;
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(emailVal)) {
+        showMessage('Hata: Lütfen geçerli bir e-posta adresi giriniz!', false);
+        return;
+    }
+
     const data = {
         tckn: document.getElementById('update-tckn').value,
         ad: document.getElementById('update-ad').value,
         soyad: document.getElementById('update-soyad').value,
+        email: emailVal,
         telefon: document.getElementById('update-telefon').value || null,
         yas: document.getElementById('update-yas').value ? parseInt(document.getElementById('update-yas').value) : null,
         maas: document.getElementById('update-maas').value ? parseFloat(document.getElementById('update-maas').value) : null,
@@ -396,6 +407,10 @@ updateForm.addEventListener('submit', (e) => {
 personelForm.addEventListener('submit', (e) => {
     e.preventDefault();
 
+    const submitBtn = e.target.querySelector('button[type="submit"]');
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Kaydediliyor...';
+
     const tcknVal = document.getElementById('tckn').value;
 
     // 🔍 TC Kimlik No - Sadece Rakam Kontrolü ve Uzunluk Kontrolü (İstediğin Kritik Regex Kodu)
@@ -404,10 +419,18 @@ personelForm.addEventListener('submit', (e) => {
         return;
     }
 
+    const emailVal = document.getElementById('email').value;
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(emailVal)) {
+        showMessage('Hata: Lütfen geçerli bir e-posta adresi giriniz!', false);
+        return;
+    }
+
     const data = {
         tckn: tcknVal,
         ad: document.getElementById('ad').value,
         soyad: document.getElementById('soyad').value,
+        email: emailVal,
         telefon: document.getElementById('telefon').value || null,
         yas: document.getElementById('yas').value ? parseInt(document.getElementById('yas').value) : null,
         maas: document.getElementById('maas').value ? parseFloat(document.getElementById('maas').value) : null,
@@ -419,7 +442,7 @@ personelForm.addEventListener('submit', (e) => {
 
     fetch(`${API_BASE_URL}`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {'Content-Type': 'application/json'},
         body: JSON.stringify(data)
     })
         .then(async res => {
@@ -433,7 +456,15 @@ personelForm.addEventListener('submit', (e) => {
                 showMessage(text, false);
             }
         })
-        .catch(err => showMessage("Kayıt sırasında bağlantı hatası oluştu!", false));
+        .catch(err => {
+            showMessage("Kayıt sırasında bağlantı hatası oluştu!", false);
+        })
+        .finally(() => {
+            // 2. İŞLEM BİTİNCE BUTONU TEKRAR AKTİF ET (Hata olsa bile kilitli kalmasın)
+            submitBtn.disabled = false;
+            submitBtn.style.opacity = "1";
+            submitBtn.textContent = 'Kaydet / Yeni Ekle';
+        });
 });
 
 
