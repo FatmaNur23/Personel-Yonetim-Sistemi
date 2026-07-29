@@ -628,16 +628,16 @@ btnExcelIndir.addEventListener('click', () => {
 const savedTheme = localStorage.getItem('theme');
 if (savedTheme === 'dark') {
     document.body.classList.add('dark-mode');
-    themeToggleBtn.textContent = '☀️ Gündüz Modu';
+    themeToggleBtn.textContent = '🌙 Dark Mode';
 }
 
 themeToggleBtn.addEventListener('click', () => {
     document.body.classList.toggle('dark-mode');
     if (document.body.classList.contains('dark-mode')) {
-        themeToggleBtn.textContent = '☀️ Gündüz Modu';
+        themeToggleBtn.textContent = '🌙 Dark Mode';
         localStorage.setItem('theme', 'dark');
     } else {
-        themeToggleBtn.textContent = '🌙 Gece Modu';
+        themeToggleBtn.textContent = '☀️ Light Mode';
         localStorage.setItem('theme', 'light');
     }
 });
