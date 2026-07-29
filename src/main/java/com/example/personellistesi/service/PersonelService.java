@@ -1,5 +1,6 @@
 package com.example.personellistesi.service;
 
+import com.example.personellistesi.model.BildirimLog;
 import com.example.personellistesi.model.Departman;
 import com.example.personellistesi.model.Personel;
 import com.example.personellistesi.repo.DepartmanRepository;
@@ -24,6 +25,9 @@ public class PersonelService {
 
     @Autowired
     private DepartmanRepository departmanRepository;
+
+    @Autowired
+    private IBildirimLogService bildirimLogService;
 
 
 
@@ -232,6 +236,13 @@ public class PersonelService {
 
         Personel kaydedilenPersonel = personelRepository.save(personel);
 
+        BildirimLog yeniLog = new BildirimLog(
+                "Yeni Personel Kaydı Başarılı",
+                "Sayın " + kaydedilenPersonel.getAd() + " " + kaydedilenPersonel.getSoyad() +
+                        ", sistemimize başarıyla eklendiniz.",
+                kaydedilenPersonel.getEmail()
+        );
+        bildirimLogService.saveLog(yeniLog);
 
         // 3. EKLENEN YER: Kaydedilen personeli geri döndürüyoruz
         return kaydedilenPersonel;
@@ -254,12 +265,25 @@ public class PersonelService {
         // Diğer bilgileri güncelle
         mevcutPersonel.setAd(guncelBilgiler.getAd());
         mevcutPersonel.setSoyad(guncelBilgiler.getSoyad());
+        mevcutPersonel.setEmail(guncelBilgiler.getEmail());
         mevcutPersonel.setTelefon(guncelBilgiler.getTelefon());
         mevcutPersonel.setYas(guncelBilgiler.getYas());
         mevcutPersonel.setMaas(guncelBilgiler.getMaas());
         mevcutPersonel.setDepartman(guncelBilgiler.getDepartman());
 
-        return personelRepository.save(mevcutPersonel);
+        Personel guncellenenPersonel = personelRepository.save(mevcutPersonel);
+
+        if (guncellenenPersonel.getEmail() != null) {
+            BildirimLog log = new BildirimLog(
+                    "Profil Bilgileriniz Güncellendi",
+                    "Sayın " + guncellenenPersonel.getAd() + " " + guncellenenPersonel.getSoyad() +
+                            ", sistemdeki personel bilgileriniz başarıyla güncellenmiştir.",
+                    guncellenenPersonel.getEmail()
+            );
+            bildirimLogService.saveLog(log);
+        }
+
+        return guncellenenPersonel;
     }
 
     // ─── TÜM PERSONELLERİ LİSTELEME SERVİSİ ───
@@ -270,6 +294,16 @@ public class PersonelService {
     // ─── ID'YE GÖRE PERSONEL SİLME SERVİSİ ───
     @Transactional
     public void idIleSil(String id) {
+        Personel silinecekPersonel = personelRepository.findById(id).orElse(null);
+        if (silinecekPersonel != null && silinecekPersonel.getEmail() != null) {
+            BildirimLog log = new BildirimLog(
+                    "Sistemden Kaydınız Silindi",
+                    "Sayın " + silinecekPersonel.getAd() + " " + silinecekPersonel.getSoyad() +
+                            ", şirket sistemimizdeki personel kaydınız silinmiştir. İyi günler dileriz.",
+                    silinecekPersonel.getEmail()
+            );
+            bildirimLogService.saveLog(log);
+        }
         personelRepository.deleteById(id);
     }
 
