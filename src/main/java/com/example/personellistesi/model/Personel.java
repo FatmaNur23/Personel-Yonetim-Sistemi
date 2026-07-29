@@ -31,6 +31,9 @@ public class Personel {
     @Column(name = "maaş")
     private Float maas;
 
+    @Column(length = 128, unique = true)
+    private String email;
+
     @Column(name = "işe_giriş_tarihi", nullable = false)
     private LocalDate iseGirisTarihi;
 
@@ -66,6 +69,8 @@ public class Personel {
     public void setYas(Integer yas) { this.yas = yas; }
     public Float getMaas() { return maas; }
     public void setMaas(Float maas) { this.maas = maas; }
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
     public LocalDate getIseGirisTarihi() { return iseGirisTarihi; }
     public void setIseGirisTarihi(LocalDate iseGirisTarihi) { this.iseGirisTarihi = iseGirisTarihi; }
     public LocalDateTime getKartSonGuncelleme() { return kartSonGuncelleme; }

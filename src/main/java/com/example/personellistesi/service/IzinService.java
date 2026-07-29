@@ -1,5 +1,6 @@
 package com.example.personellistesi.service;
 
+import com.example.personellistesi.model.BildirimLog;
 import com.example.personellistesi.model.Izin;
 import com.example.personellistesi.model.Personel;import com.example.personellistesi.repo.IzinRepository;
 import com.example.personellistesi.repo.PersonelRepository;
@@ -17,6 +18,9 @@ public class IzinService {
     @Autowired
     private PersonelRepository personelRepository;
 
+    @Autowired
+    private IBildirimLogService bildirimLogService;
+
     // ─── 1. YENİ İZİN EKLEME ───
     @Transactional
     public Izin izinEkle(Izin izin) {
@@ -27,7 +31,18 @@ public class IzinService {
                 .orElseThrow(() -> new IllegalArgumentException("Hata: Geçersiz Personel ID! Sistemde böyle bir personel bulunamadı."));
 
         izin.setPersonel(personel);
-        return izinRepository.save(izin);
+        Izin kaydedilenIzin = izinRepository.save(izin);
+        if (personel.getEmail() != null) {
+            BildirimLog log = new BildirimLog(
+                    "Yeni İzin Talebiniz İşlendi",
+                    "Sayın " + personel.getAd() + " " + personel.getSoyad() + ", \n" +
+                            kaydedilenIzin.getBaslangicTarihi() + " ile " + kaydedilenIzin.getBitisTarihi() +
+                            " tarihleri arasındaki izin talebiniz sisteme başarıyla işlenmiştir.",
+                    personel.getEmail()
+            );
+            bildirimLogService.saveLog(log);
+        }
+        return kaydedilenIzin;
     }
 
     // ─── 2. BELİRLİ BİR PERSONELİN İZİNLERİNİ GETİRME ───
