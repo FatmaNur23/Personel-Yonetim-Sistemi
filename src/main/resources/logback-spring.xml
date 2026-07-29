@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+    <!-- Log Saklama Klasörleri -->
+    <property name="LOGS_DIR" value="./logs" />
+    <property name="ARCHIVE_DIR" value="${LOGS_DIR}/archived" />
+
+    <!-- Konsol Log Formatı (Güncel <encoder> kullanımı) -->
+    <appender name="Console" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %highlight(%-5level) %cyan(%logger{36}) - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- Dosya Log (Güncel SizeAndTimeBasedRollingPolicy kullanımı) -->
+    <appender name="RollingFile" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOGS_DIR}/app.log</file>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+
+        <!-- Güne ve Boyuta Göre Yeni Dosyaya Geçme Politikası -->
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <!-- Günlük Arşivleme Örneği: logs/archived/app-2026-07-29.0.log.gz -->
+            <fileNamePattern>${ARCHIVE_DIR}/app-%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
+            <maxFileSize>10MB</maxFileSize>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+    </appender>
+
+    <!-- ROOT LOG SEVİYELERİ -->
+    <root level="INFO">
+        <appender-ref ref="Console" />
+        <appender-ref ref="RollingFile" />
+    </root>
+
+    <!-- Bizim projemize özel DEBUG seviyesi -->
+    <logger name="com.example.personellistesi" level="DEBUG" additivity="false">
+        <appender-ref ref="Console" />
+        <appender-ref ref="RollingFile" />
+    </logger>
+
+</configuration>
