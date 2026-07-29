@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.UUID;
+
 @Entity
 @Table(name = "roles")
 @Getter
@@ -13,9 +15,15 @@ import lombok.Setter;
 public class Role {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private String id;
 
     @Column(nullable = false, unique = true)
-    private String name; // Örn: ROLE_ADMIN, ROLE_USER
+    private String name;
+
+    @PrePersist
+    public void prePersist() {
+        if (this.id == null) {
+            this.id = UUID.randomUUID().toString();
+        }
+    }
 }

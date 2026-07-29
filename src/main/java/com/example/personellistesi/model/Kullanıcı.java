@@ -7,6 +7,7 @@ import lombok.Setter;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
 @Entity
 @Table(name = "kullanici")
@@ -16,7 +17,6 @@ import java.util.Set;
 public class Kullanıcı {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private String id;
 
     @Column(nullable = false, unique = true)
@@ -31,13 +31,16 @@ public class Kullanıcı {
     @Column(nullable = false)
     private boolean isActive = true;
 
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(
-            name = "user_roles",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "role_id")
-    )
-    private Set<Role> roles = new HashSet<>();
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "role_id", nullable = false)
+    private Role role;
+
+    @PrePersist
+    public void prePersist() {
+        if (this.id == null) {
+            this.id = UUID.randomUUID().toString();
+        }
 
 
+    }
 }
