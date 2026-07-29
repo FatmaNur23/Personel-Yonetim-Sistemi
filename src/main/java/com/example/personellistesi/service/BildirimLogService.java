@@ -2,6 +2,7 @@ package com.example.personellistesi.service;
 
 import com.example.personellistesi.model.BildirimLog;
 import com.example.personellistesi.repo.BildirimLogRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Slf4j
 @Service
 public class BildirimLogService implements IBildirimLogService {
 
@@ -23,12 +25,19 @@ public class BildirimLogService implements IBildirimLogService {
 
     @Override
     public BildirimLog saveLog(BildirimLog bildirimLog) {
+        log.info("Bildirim kaydı işlemi başlatılıyor. Alıcı: {}, Konu: {}",
+                bildirimLog.getToAddress(), bildirimLog.getSubject());
+
         gercekMailiGonder(bildirimLog.getToAddress(), bildirimLog.getSubject(), bildirimLog.getContent());
-        return bildirimLogRepository.save(bildirimLog);
+
+        BildirimLog kaydedilenLog = bildirimLogRepository.save(bildirimLog);
+        log.info("Bildirim logu veritabanına başarıyla kaydedildi. Log ID: {}", kaydedilenLog.getId());
+        return kaydedilenLog;
     }
 
     private void gercekMailiGonder(String kime, String konu, String icerik) {
         try {
+            log.debug("Mail gönderme isteği hazırlanıyor: Target -> {}", kime);
             SimpleMailMessage mesaj = new SimpleMailMessage();
             mesaj.setFrom("senin.mailin@gmail.com"); // application.properties'e yazdığın mail adresini buraya da yaz
             mesaj.setTo(kime);
@@ -36,9 +45,10 @@ public class BildirimLogService implements IBildirimLogService {
             mesaj.setText(icerik);
 
             mailSender.send(mesaj);
-            System.out.println("E-posta başarıyla gönderildi: " + kime);
+            log.info("E-posta başarıyla gönderildi -> Alıcı: {}", kime);
+
         } catch (Exception e) {
-            System.err.println("E-posta GÖNDERİLEMEDİ! Hata: " + e.getMessage());
+            log.error("E-posta gönderimi sırasında HATA oluştu! Alıcı: {}, Hata Mesajı: {}", kime, e.getMessage(), e);
             // Mail gönderilemese bile hata fırlatmıyoruz ki veritabanı loglama işlemi yarıda kesilmesin.
         }
     }
@@ -46,17 +56,23 @@ public class BildirimLogService implements IBildirimLogService {
 
     @Override
     public BildirimLog getLogById(String id) {
+        log.debug("Log aranıyor, ID: {}", id);
         return bildirimLogRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Hata: " + id + " numaralı log bulunamadı!"));
+                .orElseThrow(() -> {
+                    log.warn("Aranan log veritabanında bulunamadı! ID: {}", id);
+                    return new IllegalArgumentException("Hata: " + id + " numaralı log bulunamadı!");
+                });
     }
 
     @Override
     public List<BildirimLog> getAllLogs() {
+        log.info("Tüm bildirim logları listeleniyor.");
         return bildirimLogRepository.findAll();
     }
 
     @Override
     public List<BildirimLog> getLogsByToAddress(String toAddress) {
+        log.info("E-posta adresine göre loglar getiriliyor: {}", toAddress);
         return bildirimLogRepository.findByToAddress(toAddress);
     }
 }

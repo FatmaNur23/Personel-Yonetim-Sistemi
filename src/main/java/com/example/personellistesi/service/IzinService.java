@@ -4,12 +4,14 @@ import com.example.personellistesi.model.BildirimLog;
 import com.example.personellistesi.model.Izin;
 import com.example.personellistesi.model.Personel;import com.example.personellistesi.repo.IzinRepository;
 import com.example.personellistesi.repo.PersonelRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+@Slf4j
 @Service
 public class IzinService {
     @Autowired
@@ -24,11 +26,14 @@ public class IzinService {
     // ─── 1. YENİ İZİN EKLEME ───
     @Transactional
     public Izin izinEkle(Izin izin) {
+        log.info("Yeni izin talebi işleniyor. Personel ID: {}", izin.getPersonel().getId());
         validasyonlariKontrolEt(izin);
 
-        // Personel gerçekten var mı kontrolü
         Personel personel = personelRepository.findById(izin.getPersonel().getId())
-                .orElseThrow(() -> new IllegalArgumentException("Hata: Geçersiz Personel ID! Sistemde böyle bir personel bulunamadı."));
+                .orElseThrow(() -> {
+                            log.error("İzin eklenemedi! Geçersiz Personel ID: {}", izin.getPersonel().getId());
+                            return new IllegalArgumentException("Hata: Geçersiz Personel ID! Sistemde böyle bir personel bulunamadı.");
+                        });
 
         izin.setPersonel(personel);
         Izin kaydedilenIzin = izinRepository.save(izin);

@@ -5,6 +5,7 @@ import com.example.personellistesi.model.Departman;
 import com.example.personellistesi.model.Personel;
 import com.example.personellistesi.repo.DepartmanRepository;
 import com.example.personellistesi.repo.PersonelRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +19,7 @@ import java.io.InputStream;
 import java.time.ZoneId;
 import java.util.*;
 
+@Slf4j
 @Service
 public class PersonelService {
     @Autowired
@@ -224,26 +226,33 @@ public class PersonelService {
     // ─── YENİ: PERSONEL EKLEME (POST) ───
     @Transactional
     public Personel personelEkle(Personel personel) {
-        // Departman kontrolü
+        log.info("Yeni personel ekleme işlemi başlatıldı. İsim: {} {}", personel.getAd(), personel.getSoyad());
         if (personel.getDepartman() == null || personel.getDepartman().getId() == null) {
+            log.error("Personel eklenemedi! Departman bilgisi eksik.");
             throw new IllegalArgumentException("Departman ID eksik!");
         }
 
         Departman departman = departmanRepository.findById(personel.getDepartman().getId())
-                .orElseThrow(() -> new IllegalArgumentException("Geçersiz Departman ID!"));
+                .orElseThrow(() -> {
+                    log.error("Personel eklenemedi! Geçersiz Departman ID: {}", personel.getDepartman().getId());
+                    return new IllegalArgumentException("Geçersiz Departman ID!");
+                });
+
 
         personel.setDepartman(departman); // Doğrulanmış departmanı atıyoruz
 
         Personel kaydedilenPersonel = personelRepository.save(personel);
+        log.info("Personel sisteme başarıyla kaydedildi. Veritabanı ID: {}", kaydedilenPersonel.getId());
 
-        BildirimLog yeniLog = new BildirimLog(
-                "Yeni Personel Kaydı Başarılı",
-                "Sayın " + kaydedilenPersonel.getAd() + " " + kaydedilenPersonel.getSoyad() +
-                        ", sistemimize başarıyla eklendiniz.",
-                kaydedilenPersonel.getEmail()
-        );
-        bildirimLogService.saveLog(yeniLog);
-
+        if (kaydedilenPersonel.getEmail() != null && !kaydedilenPersonel.getEmail().isEmpty()) {
+            BildirimLog yeniLog = new BildirimLog(
+                    "Yeni Personel Kaydı Başarılı",
+                    "Sayın " + kaydedilenPersonel.getAd() + " " + kaydedilenPersonel.getSoyad() +
+                            ", sistemimize başarıyla eklendiniz.",
+                    kaydedilenPersonel.getEmail()
+            );
+            bildirimLogService.saveLog(yeniLog);
+        }
         // 3. EKLENEN YER: Kaydedilen personeli geri döndürüyoruz
         return kaydedilenPersonel;
 
@@ -252,8 +261,13 @@ public class PersonelService {
     // ─── YENİ: PERSONEL GÜNCELLEME (PUT) ───
     @Transactional
     public Personel personelGuncelle(String id, Personel guncelBilgiler) {
+        log.info("Personel güncelleme isteği alındı. Güncellenecek ID: {}", id);
+
         Personel mevcutPersonel = personelRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Güncellenecek personel bulunamadı!"));
+                .orElseThrow(() ->{
+                    log.warn("Güncelleme başarısız! Aranan personel bulunamadı. ID: {}", id);
+                    return new IllegalArgumentException("Güncellenecek personel bulunamadı!");
+                });
 
         // Yeni departman atanmışsa doğrula ve güncelle
         if (guncelBilgiler.getDepartman() != null && guncelBilgiler.getDepartman().getId() != null) {
@@ -272,6 +286,7 @@ public class PersonelService {
         mevcutPersonel.setDepartman(guncelBilgiler.getDepartman());
 
         Personel guncellenenPersonel = personelRepository.save(mevcutPersonel);
+        log.info("Personel bilgileri başarıyla güncellendi. ID: {}", guncellenenPersonel.getId());
 
         if (guncellenenPersonel.getEmail() != null) {
             BildirimLog log = new BildirimLog(
@@ -294,6 +309,8 @@ public class PersonelService {
     // ─── ID'YE GÖRE PERSONEL SİLME SERVİSİ ───
     @Transactional
     public void idIleSil(String id) {
+        log.info("Personel silme işlemi başlatıldı. Silinecek ID: {}", id);
+
         Personel silinecekPersonel = personelRepository.findById(id).orElse(null);
         if (silinecekPersonel != null && silinecekPersonel.getEmail() != null) {
             BildirimLog log = new BildirimLog(
@@ -305,6 +322,7 @@ public class PersonelService {
             bildirimLogService.saveLog(log);
         }
         personelRepository.deleteById(id);
+        log.info("Personel veritabanından başarıyla silindi. ID: {}", id);
     }
 
 
