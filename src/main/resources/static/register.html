@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kayıt Ol - Personel Yönetim Sistemi</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="container" style="display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px 0;">
+    <!-- Üst Bar: Gece/Gündüz Modu Butonu Sağ Üstte -->
+    <div class="top-bar" style="position: absolute; top: 20px; right: 20px; box-shadow: none; background: transparent;">
+        <button id="themeToggle" class="btn-theme">🌙 Gece Modu</button>
+    </div>
+
+    <!-- Kayıt Kartı -->
+    <div class="card" style="width: 400px; padding: 30px;">
+        <h2 style="text-align: center; margin-bottom: 20px; border-bottom: 2px solid var(--border-color); padding-bottom: 10px;">✨ Hesap Oluştur</h2>
+
+        <form id="registerForm" class="grid-form">
+            <div class="form-group full-width">
+                <label for="username">Kullanıcı Adı:</label>
+                <input type="text" id="username" required placeholder="Kullanıcı adınızı girin">
+            </div>
+
+            <div class="form-group full-width" style="margin-top: 10px;">
+                <label for="email">E-posta Adresi:</label>
+                <input type="email" id="email" required placeholder="ornek@sirket.com">
+            </div>
+
+            <div class="form-group full-width" style="margin-top: 10px;">
+                <label for="password">Şifre:</label>
+                <input type="password" id="password" required placeholder="Şifrenizi belirleyin">
+            </div>
+
+            <div class="form-group full-width" style="margin-top: 20px;">
+                <button type="submit" class="btn btn-block btn-success">Kayıt Ol</button>
+            </div>
+        </form>
+
+        <div id="resultMsg" class="message hidden" style="margin-top: 15px;"></div>
+
+        <div style="text-align: center; margin-top: 20px;">
+            <a href="login.html" style="color: var(--primary-color); text-decoration: none; font-weight: 600; font-size: 0.9rem;">Zaten hesabın var mı? Giriş yap</a>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Kayıt İsteği
+    document.getElementById('registerForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const username = document.getElementById('username').value;
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        const resultMsg = document.getElementById('resultMsg');
+        resultMsg.classList.add('hidden');
+        resultMsg.textContent = "";
+
+        try {
+            const response = await fetch('http://localhost:8080/api/auth/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, email, password })
+            });
+
+            const text = await response.text();
+
+            if (response.ok) {
+                resultMsg.textContent = "Kayıt başarılı! Lütfen hesabınızı aktif etmek için mailinizi kontrol edin.";
+                resultMsg.className = "message success";
+                resultMsg.classList.remove('hidden');
+            } else {
+                resultMsg.textContent = text || "Kayıt sırasında bir hata oluştu.";
+                resultMsg.className = "message error";
+                resultMsg.classList.remove('hidden');
+            }
+        } catch (err) {
+            resultMsg.textContent = "Sunucuya bağlanılamadı!";
+            resultMsg.className = "message error";
+            resultMsg.classList.remove('hidden');
+        }
+    });
+
+    // Gece/Gündüz Modu Yönetimi
+    const themeToggleBtn = document.getElementById('themeToggle');
+    const savedTheme = localStorage.getItem('theme');
+
+    if (savedTheme === 'dark') {
+        document.body.classList.add('dark-mode');
+        themeToggleBtn.textContent = '🌙Dark Mode';
+    }
+
+    themeToggleBtn.addEventListener('click', () => {
+        document.body.classList.toggle('dark-mode');
+        if (document.body.classList.contains('dark-mode')) {
+            themeToggleBtn.textContent = '️🌙 Dark Mode';
+            localStorage.setItem('theme', 'dark');
+        } else {
+            themeToggleBtn.textContent = '☀️ Light Mode';
+            localStorage.setItem('theme', 'light');
+        }
+    });
+</script>
+
+</body>
+</html>
+
+

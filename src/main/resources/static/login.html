@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Giriş Yap - Personel Yönetim Sistemi</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="container" style="display: flex; justify-content: center; align-items: center; height: 100vh;">
+    <!-- Üst Bar: Gece/Gündüz Modu Butonu Sağ Üstte -->
+    <div class="top-bar" style="position: absolute; top: 20px; right: 20px; box-shadow: none; background: transparent;">
+        <button id="themeToggle" class="btn-theme">🌙 Gece Modu</button>
+    </div>
+
+    <!-- Giriş Kartı (Ana sayfadaki .card yapısının aynısı) -->
+    <div class="card" style="width: 400px; padding: 30px;">
+        <h2 style="text-align: center; margin-bottom: 20px; border-bottom: 2px solid var(--border-color); padding-bottom: 10px;">👤 Giriş Yap</h2>
+
+        <form id="loginForm" class="grid-form">
+            <div class="form-group full-width">
+                <label for="username">Kullanıcı Adı:</label>
+                <input type="text" id="username" required placeholder="Kullanıcı adınızı girin">
+            </div>
+
+            <div class="form-group full-width" style="margin-top: 10px;">
+                <label for="password">Şifre:</label>
+                <input type="password" id="password" required placeholder="Şifrenizi girin">
+            </div>
+
+            <div class="form-group full-width" style="margin-top: 20px;">
+                <button type="submit" class="btn btn-block btn-primary">Giriş Yap</button>
+            </div>
+        </form>
+
+        <div id="errorMsg" class="message hidden" style="margin-top: 15px;"></div>
+
+        <div style="text-align: center; margin-top: 20px;">
+            <a href="register.html" style="color: var(--primary-color); text-decoration: none; font-weight: 600; font-size: 0.9rem;">Hesabınız yok mu? Hesap oluştur</a>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Giriş İsteği ve JWT Token Kaydı
+    document.getElementById('loginForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+        const errorMsg = document.getElementById('errorMsg');
+        errorMsg.classList.add('hidden');
+        errorMsg.textContent = "";
+
+        try {
+            const response = await fetch('http://localhost:8080/api/auth/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password })
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                // Token'ı localStorage'a güvenle kaydediyoruz
+                localStorage.setItem('jwtToken', data.token);
+                window.location.href = 'index.html';
+            } else {
+                errorMsg.textContent = data.message || "Giriş başarısız! Bilgilerinizi veya hesabınızın aktif olup olmadığını kontrol edin.";
+                errorMsg.className = "message error";
+                errorMsg.classList.remove('hidden');
+            }
+        } catch (err) {
+            errorMsg.textContent = "Sunucuya bağlanılamadı!";
+            errorMsg.className = "message error";
+            errorMsg.classList.remove('hidden');
+        }
+    });
+
+    // Ana sayfanın Gece/Gündüz Modu mantığının birebir aynısı
+    const themeToggleBtn = document.getElementById('themeToggle');
+    const savedTheme = localStorage.getItem('theme');
+
+    if (savedTheme === 'dark') {
+        document.body.classList.add('dark-mode');
+        themeToggleBtn.textContent = '🌙️ Dark Mode';
+    }
+
+    themeToggleBtn.addEventListener('click', () => {
+        document.body.classList.toggle('dark-mode');
+        if (document.body.classList.contains('dark-mode')) {
+            themeToggleBtn.textContent = '🌙️ Dark Mode';
+            localStorage.setItem('theme', 'dark');
+        } else {
+            themeToggleBtn.textContent = '☀️ Light Mode';
+            localStorage.setItem('theme', 'light');
+        }
+    });
+</script>
+
+</body>
+</html>
+
+

@@ -59,12 +59,14 @@ function showMessage(text, isSuccess) {
 
 // ─── VERİLERİ BACKEND'DEN ÇEKME ───
 function tumPersonelleriGetir() {
-    // Normalde backend'de tümünü çeken GET ucunuzu (/api/personeller/excel-indir gibi)
-    // Excel olarak tasarladınız. Ancak ana sayfa listesi için veritabanındaki verileri
-    // anlık okuyabilmek için, bu fetch bloğu Spring'in /api/personeller/liste (veya benzeri)
-    // endpoint'iyle konuşur. Spring'de List<Personel> dönen bir GET ucu yoksa projenizde,
-    // lütfen Controller'a ek bir liste GET ucu yazmayı unutmayın.
-    fetch(`${API_BASE_URL}/liste`)
+    const token = localStorage.getItem('jwtToken');
+    fetch(`${API_BASE_URL}/liste`, {
+        method: 'GET',
+        headers: {
+            'Authorization': 'Bearer ' + token, // Güvenlik kapısından geçmek için ekledik
+            'Content-Type': 'application/json'
+        }
+    })
         .then(res => {
             if (!res.ok) throw new Error("Veriler yüklenemedi!");
             return res.json();
@@ -83,7 +85,14 @@ function tumPersonelleriGetir() {
 
 // ─── DEPARTMANLARI BACKEND'DEN ÇEK VE KUTULARA DOLDUR ───
 function departmanlariGetir() {
-    fetch(DEPARTMAN_API_URL)
+    const token = localStorage.getItem('jwtToken');
+    fetch(DEPARTMAN_API_URL, {
+        method: 'GET',
+        headers: {
+            'Authorization': 'Bearer ' + token, // Header'a ekliyoruz
+            'Content-Type': 'application/json'
+        }
+    })
         .then(res => res.json())
         .then(data => {
             let optionsHTML = '<option value="">-- Lütfen Departman Seçin --</option>';
@@ -440,13 +449,16 @@ personelForm.addEventListener('submit', (e) => {
         }
     };
 
+    const token = localStorage.getItem('jwtToken');
+
     fetch(`${API_BASE_URL}`, {
         method: 'POST',
-        headers: {'Content-Type': 'application/json'},
+        headers: {'Content-Type': 'application/json','Authorization': 'Bearer ' + token},
         body: JSON.stringify(data)
     })
         .then(async res => {
-            const text = await res.text();
+            const contentType = res.headers.get("content-type");
+            const text = contentType && contentType.includes("application/json") ? JSON.stringify(await res.json()) : await res.text();
             if (res.ok) {
                 showMessage(text, true);
                 personelForm.reset();
@@ -457,6 +469,7 @@ personelForm.addEventListener('submit', (e) => {
             }
         })
         .catch(err => {
+            console.error(err);
             showMessage("Kayıt sırasında bağlantı hatası oluştu!", false);
         })
         .finally(() => {

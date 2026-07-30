@@ -32,7 +32,7 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // Session tutmayacağız, JWT kullanacağız
                 .authorizeHttpRequests(auth -> auth
                         // Kayıt ol ve Giriş yap sayfaları herkese açık olacak!
-                        .requestMatchers("/api/auth/**", "/api/auth/activate").permitAll()
+                        .requestMatchers("/api/auth/**","/api/departmanlar", "/login.html", "/register.html", "/index.html", "/", "/*.css", "/*.js").permitAll()
                         // Diğer tüm istekler mutlaka JWT token gerektirecek
                         .anyRequest().authenticated()
                 )
