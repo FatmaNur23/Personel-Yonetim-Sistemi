@@ -11,13 +11,14 @@ public class MailService {
     @Autowired
     private  JavaMailSender mailSender;
 
-    public  void personelHosgeldinMailiGonder(String aliciMail, String personelAd, String departmanAd, String iseGirisTarihi) {
+    public void personelHosgeldinMailiGonder(String aliciMail, String personelAd,String token) {
+
+        String aktivasyonUrl = "http://localhost:8080/api/auth/activate?token=" + token;
 
         // 1. Mail içeriğini doğrudan String olarak oluşturuyoruz ( \n ile alt satıra geçilir )
         String mesajIcerigi = "Merhaba " + personelAd + ",\n\n"
-                + "Şirketimize ve Personel Yönetim Sistemimize hoş geldin! Kaydın başarıyla oluşturuldu.\n\n"
-                + "Departman: " + (departmanAd != null ? departmanAd : "Belirtilmedi") + "\n"
-                + "İşe Giriş Tarihi: " + iseGirisTarihi + "\n\n"
+                + "Şirketimize ve Personel Yönetim Sistemimize hoş geldin! Kaydının tamamlanması için lütfen aşağıdaki linke tıkla:\n\n"
+                + aktivasyonUrl + "\n\n"
                 + "İyi çalışmalar dileriz.";
 
         // 2. Basit mail nesnesini oluşturma
