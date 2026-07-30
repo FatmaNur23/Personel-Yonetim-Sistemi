@@ -359,7 +359,22 @@
     </ul>
 </div>
 
+
 <script src="app.js"></script>
+
+<script>
+    window.onload = function() {
+        const token = localStorage.getItem('jwtToken');
+        if (!token) {
+            window.location.href = 'login.html'; // Giriş yapmamışsa login'e atar
+        }
+    };
+    function logout() {
+        localStorage.removeItem('jwtToken'); // Token'ı siler
+        window.location.href = 'login.html'; // Giriş ekranına gönderir
+    }
+</script>
+
 </body>
 </html>
 
