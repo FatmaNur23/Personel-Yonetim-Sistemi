@@ -1,5 +1,7 @@
 package com.example.personellistesi.service;
 
+import com.example.personellistesi.DTO.LoginRequestDto;
+import com.example.personellistesi.DTO.LoginResponseDto;
 import com.example.personellistesi.DTO.UserRegistrationDto;
 import com.example.personellistesi.model.Kullanıcı;
 import com.example.personellistesi.model.Kullanıcı;
@@ -7,6 +9,7 @@ import com.example.personellistesi.model.Role;
 import com.example.personellistesi.repo.KullanıcıRepository;
 import com.example.personellistesi.repo.KullanıcıRepository;
 import com.example.personellistesi.repo.RoleRepository;
+import com.example.personellistesi.security.JwtTokenProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -24,6 +27,12 @@ public class AuthService {
 
     @Autowired
     private JavaMailSender mailSender;
+
+    @Autowired
+    private JwtTokenProvider tokenProvider;
+
+    @Autowired
+    private MailService mailService;
 
     //  Kayıt Olma Metodu
     public String registerUser(UserRegistrationDto dto) {
@@ -46,21 +55,10 @@ public class AuthService {
         kullaniciRepository.save(kullanici);
 
         // Aktivasyon Maili Gönderme
-        sendActivationEmail(kullanici.getEmail(), token);
+        mailService.personelHosgeldinMailiGonder(kullanici.getEmail(), kullanici.getUsername(), token);
+
 
         return "Kayıt başarılı! Lütfen hesabınızı aktif etmek için mailinizi kontrol edin.";
-    }
-
-    //  Mail Gönderme Yardımcı Metodu
-    private void sendActivationEmail(String toEmail, String token) {
-        String activationUrl = "http://localhost:8080/api/auth/activate?token=" + token;
-
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setTo(toEmail);
-        message.setSubject("Hesap Aktivasyonu - Personel Yönetim Sistemi");
-        message.setText("Hesabınızı aktif etmek için aşağıdaki linke tıklayın:\n\n" + activationUrl);
-
-        mailSender.send(message);
     }
 
     //  Hesabı Aktif Etme Metodu
@@ -74,4 +72,27 @@ public class AuthService {
 
         return "Hesabınız başarıyla aktive edildi! Giriş yapabilirsiniz.";
     }
+
+
+    public LoginResponseDto loginUser(LoginRequestDto dto) {
+        // 1. Kullanıcıyı bul
+        Kullanıcı kullanici = kullaniciRepository.findByUsername(dto.getUsername())
+                .orElseThrow(() -> new RuntimeException("Kullanıcı adı veya şifre hatalı!"));
+
+        // 2. Şifre kontrolü (Şimdilik düz metin karşılaştırıyoruz, ileride PasswordEncoder ekleyebiliriz)
+        if (!kullanici.getPassword().equals(dto.getPassword())) {
+            throw new RuntimeException("Kullanıcı adı veya şifre hatalı!");
+        }
+
+        // 3. Hesap aktif mi kontrolü (Aktivasyon mailine tıklamış mı?)
+        if (!kullanici.isActive()) {
+            throw new RuntimeException("Hesabınız aktif değil! Lütfen önce mailinizdeki aktivasyon linkine tıklayın.");
+        }
+
+        // 4. Her şey yolundaysa JWT Token üret
+        String token = tokenProvider.generateToken(kullanici.getUsername(), kullanici.getRole().getName());
+
+        return new LoginResponseDto(token, "Giriş başarılı!");
+    }
+
 }

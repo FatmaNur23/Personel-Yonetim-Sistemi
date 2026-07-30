@@ -1,5 +1,7 @@
 package com.example.personellistesi.controller;
 
+import com.example.personellistesi.DTO.LoginRequestDto;
+import com.example.personellistesi.DTO.LoginResponseDto;
 import com.example.personellistesi.DTO.UserRegistrationDto;
 import com.example.personellistesi.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +26,12 @@ public class AuthController {
     @GetMapping("/activate")
     public ResponseEntity<String> activateAccount(@RequestParam("token") String token) {
         String response = authService.activateAccount(token);
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<LoginResponseDto> login(@RequestBody LoginRequestDto dto) {
+        LoginResponseDto response = authService.loginUser(dto);
         return ResponseEntity.ok(response);
     }
 
