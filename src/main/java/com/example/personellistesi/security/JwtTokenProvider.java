@@ -9,8 +9,7 @@ import java.util.Date;
 @Component
 public class JwtTokenProvider {
 
-    // Token imzalamak için gizli anahtar (Gerçek projelerde application.properties'e yazılır)
-    private  Key jwtSecret = Keys.secretKeyFor(SignatureAlgorithm.HS512);
+    private final Key key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
     private long jwtExpirationInMs = 86400000;   //Hesap 1 gün kayıtlı olacak
 
 
@@ -21,16 +20,16 @@ public class JwtTokenProvider {
         return Jwts.builder()
                 .setSubject(username)
                 .claim("role", role) // Kullanıcının rolünü token içine gömüyoruz
-                .setIssuedAt(new Date())
+                .setIssuedAt(now)
                 .setExpiration(expiryDate)
-                .signWith(jwtSecret)
+                .signWith(key)
                 .compact();
     }
 
     //  Token'dan Kullanıcı Adını Çözme
     public String getUsernameFromJWT(String token) {
         Claims claims = Jwts.parserBuilder()
-                .setSigningKey(jwtSecret)
+                .setSigningKey(key)
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
@@ -39,13 +38,24 @@ public class JwtTokenProvider {
     }
 
     //  Token Geçerlilik Kontrolü
-    public boolean validateToken(String authToken) {
+    public boolean validateToken(String token) {
         try {
-            Jwts.parserBuilder().setSigningKey(jwtSecret).build().parseClaimsJws(authToken);
+            Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
             return true;
-        } catch (JwtException | IllegalArgumentException e) {
-            // Süresi dolmuş, bozuk veya geçersiz token
+        } catch (Exception e) {
+            System.err.println("JWT Doğrulama Hatası: " + e.getMessage());
             return false;
         }
+    }
+
+    // Token'dan Kullanıcı Adını Çözme (Parse etme)
+    public String getUsernameFromToken(String token) {
+        Claims claims = Jwts.parserBuilder()
+                .setSigningKey(key)
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+
+        return claims.getSubject();
     }
 }

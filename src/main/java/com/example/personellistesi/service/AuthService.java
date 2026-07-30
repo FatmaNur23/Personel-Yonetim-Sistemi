@@ -13,6 +13,7 @@ import com.example.personellistesi.security.JwtTokenProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import java.util.UUID;
 
@@ -34,12 +35,15 @@ public class AuthService {
     @Autowired
     private MailService mailService;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     //  Kayıt Olma Metodu
     public String registerUser(UserRegistrationDto dto) {
 
         Kullanıcı kullanici = new Kullanıcı();
         kullanici.setUsername(dto.getUsername());
-        kullanici.setPassword(dto.getPassword()); // Şimdilik şifreleme yok dediğin için direkt atıyoruz
+        kullanici.setPassword(passwordEncoder.encode(dto.getPassword()));
         kullanici.setEmail(dto.getEmail());
         kullanici.setActive(false); // Başlangıçta pasif (mail onaylayana kadar)
 
@@ -79,8 +83,7 @@ public class AuthService {
         Kullanıcı kullanici = kullaniciRepository.findByUsername(dto.getUsername())
                 .orElseThrow(() -> new RuntimeException("Kullanıcı adı veya şifre hatalı!"));
 
-        // 2. Şifre kontrolü (Şimdilik düz metin karşılaştırıyoruz, ileride PasswordEncoder ekleyebiliriz)
-        if (!kullanici.getPassword().equals(dto.getPassword())) {
+        if(!passwordEncoder.matches(dto.getPassword(), kullanici.getPassword())) {
             throw new RuntimeException("Kullanıcı adı veya şifre hatalı!");
         }
 
