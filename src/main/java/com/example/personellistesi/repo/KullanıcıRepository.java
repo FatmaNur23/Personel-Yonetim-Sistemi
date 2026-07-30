@@ -13,4 +13,5 @@ public interface KullanıcıRepository extends JpaRepository<Kullanıcı, String
     boolean existsByEmail(String email);
     Optional<Kullanıcı> findByActivationToken(String activationToken);
 
+
 }
