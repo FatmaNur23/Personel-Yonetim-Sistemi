@@ -16,12 +16,10 @@ public class Izin {
     @JoinColumn(name = "izin_turu_id")
     private IzinTuru izinTuru;
 
-    // Birden fazla izin tek bir personele ait olabilir
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "personel_id")
     private Personel personel;
 
-    // Constructor, Getter ve Setter Metotları
     public Izin() {}
 
     public String getId() { return id; }

@@ -15,13 +15,11 @@ public class DepartmanController {
     @Autowired
     private DepartmanService departmanService;
 
-    // GET /api/departmanlar
     @GetMapping
     public ResponseEntity<List<Departman>> tumunuListele() {
         return ResponseEntity.ok(departmanService.tumDepartmanlariGetir());
     }
 
-    // GET /api/departmanlar/{id}
     @GetMapping("/{id}")
     public ResponseEntity<Departman> idIleGetir(@PathVariable String id) {
         try {

@@ -22,7 +22,7 @@ public class SecurityConfig {
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder(); // Şifreleme için BCrypt kullanıyoruz
+        return new BCryptPasswordEncoder();
     }
 
     @Bean
@@ -31,12 +31,9 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable()) // REST API'lerde CSRF genelde kapatılır
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // Session tutmayacağız, JWT kullanacağız
                 .authorizeHttpRequests(auth -> auth
-                        // Kayıt ol ve Giriş yap sayfaları herkese açık olacak!
                         .requestMatchers("/api/auth/**","/api/departmanlar", "/login.html", "/register.html", "/index.html", "/", "/*.css", "/*.js").permitAll()
-                        // Diğer tüm istekler mutlaka JWT token gerektirecek
                         .anyRequest().authenticated()
                 )
-                // JWT Filtremizi standart güvenlik filtresinin önüne ekliyoruz
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();

@@ -38,34 +38,34 @@ public class AuthService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    //  Kayıt Olma Metodu
+
     public String registerUser(UserRegistrationDto dto) {
 
         Kullanıcı kullanici = new Kullanıcı();
         kullanici.setUsername(dto.getUsername());
         kullanici.setPassword(passwordEncoder.encode(dto.getPassword()));
         kullanici.setEmail(dto.getEmail());
-        kullanici.setActive(false); // Başlangıçta pasif (mail onaylayana kadar)
+        kullanici.setActive(false);
 
-        // Benzersiz Aktivasyon Token'ı üretme
+
         String token = UUID.randomUUID().toString();
         kullanici.setActivationToken(token);
 
-        // Tek Rol Ataması (ROLE_USER)
+
         Role userRole = roleRepository.findByName("ROLE_USER")
                 .orElseThrow(() -> new RuntimeException("Rol bulunamadı"));
         kullanici.setRole(userRole);
 
         kullaniciRepository.save(kullanici);
 
-        // Aktivasyon Maili Gönderme
+
         mailService.personelHosgeldinMailiGonder(kullanici.getEmail(), kullanici.getUsername(), token);
 
 
         return "Kayıt başarılı! Lütfen hesabınızı aktif etmek için mailinizi kontrol edin.";
     }
 
-    //  Hesabı Aktif Etme Metodu
+
     public String activateAccount(String token) {
         Kullanıcı kullanici = kullaniciRepository.findByActivationToken(token)
                 .orElseThrow(() -> new RuntimeException("Geçersiz veya süresi dolmuş aktivasyon token'ı!"));
@@ -79,7 +79,6 @@ public class AuthService {
 
 
     public LoginResponseDto loginUser(LoginRequestDto dto) {
-        // 1. Kullanıcıyı bul
         Kullanıcı kullanici = kullaniciRepository.findByUsername(dto.getUsername())
                 .orElseThrow(() -> new RuntimeException("Kullanıcı adı veya şifre hatalı!"));
 
@@ -87,12 +86,10 @@ public class AuthService {
             throw new RuntimeException("Kullanıcı adı veya şifre hatalı!");
         }
 
-        // 3. Hesap aktif mi kontrolü (Aktivasyon mailine tıklamış mı?)
         if (!kullanici.isActive()) {
             throw new RuntimeException("Hesabınız aktif değil! Lütfen önce mailinizdeki aktivasyon linkine tıklayın.");
         }
 
-        // 4. Her şey yolundaysa JWT Token üret
         String token = tokenProvider.generateToken(kullanici.getUsername(), kullanici.getRole().getName());
 
         return new LoginResponseDto(token, "Giriş başarılı!");

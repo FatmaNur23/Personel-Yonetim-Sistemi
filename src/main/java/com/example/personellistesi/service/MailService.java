@@ -15,20 +15,19 @@ public class MailService {
 
         String aktivasyonUrl = "http://localhost:8080/api/auth/activate?token=" + token;
 
-        // 1. Mail içeriğini doğrudan String olarak oluşturuyoruz ( \n ile alt satıra geçilir )
         String mesajIcerigi = "Merhaba " + personelAd + ",\n\n"
                 + "Şirketimize ve Personel Yönetim Sistemimize hoş geldin! Kaydının tamamlanması için lütfen aşağıdaki linke tıkla:\n\n"
                 + aktivasyonUrl + "\n\n"
                 + "İyi çalışmalar dileriz.";
 
-        // 2. Basit mail nesnesini oluşturma
+
         SimpleMailMessage message = new SimpleMailMessage();
         message.setFrom("fatmanur2328@gmail.com");
         message.setTo(aliciMail);
         message.setSubject("Aramıza Hoş Geldiniz!");
         message.setText(mesajIcerigi);
 
-        // 3. Maili Gönderme
+
         try {
             mailSender.send(message);
             System.out.println("Mail başarıyla gönderildi: " + aliciMail);

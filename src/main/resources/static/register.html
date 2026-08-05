@@ -9,12 +9,11 @@
 <body>
 
 <div class="container" style="display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px 0;">
-    <!-- Üst Bar: Gece/Gündüz Modu Butonu Sağ Üstte -->
     <div class="top-bar" style="position: absolute; top: 20px; right: 20px; box-shadow: none; background: transparent;">
         <button id="themeToggle" class="btn-theme">🌙 Gece Modu</button>
     </div>
 
-    <!-- Kayıt Kartı -->
+
     <div class="card" style="width: 400px; padding: 30px;">
         <h2 style="text-align: center; margin-bottom: 20px; border-bottom: 2px solid var(--border-color); padding-bottom: 10px;">✨ Hesap Oluştur</h2>
 
@@ -48,7 +47,7 @@
 </div>
 
 <script>
-    // Kayıt İsteği
+
     document.getElementById('registerForm').addEventListener('submit', async function(e) {
         e.preventDefault();
         const username = document.getElementById('username').value;
@@ -83,7 +82,7 @@
         }
     });
 
-    // Gece/Gündüz Modu Yönetimi
+
     const themeToggleBtn = document.getElementById('themeToggle');
     const savedTheme = localStorage.getItem('theme');
 

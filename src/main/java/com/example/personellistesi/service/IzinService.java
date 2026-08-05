@@ -23,7 +23,7 @@ public class IzinService {
     @Autowired
     private IBildirimLogService bildirimLogService;
 
-    // ─── 1. YENİ İZİN EKLEME ───
+
     @Transactional
     public Izin izinEkle(Izin izin) {
         log.info("Yeni izin talebi işleniyor. Personel ID: {}", izin.getPersonel().getId());
@@ -50,16 +50,15 @@ public class IzinService {
         return kaydedilenIzin;
     }
 
-    // ─── 2. BELİRLİ BİR PERSONELİN İZİNLERİNİ GETİRME ───
+
     public List<Izin> personeleAitIzinleriGetir(String personelId) {
-        // Personel varlık kontrolü
         if (!personelRepository.existsById(personelId)) {
             throw new IllegalArgumentException("Hata: " + personelId + " ID'li personel bulunamadı!");
         }
         return izinRepository.findByPersonelId(personelId);
     }
 
-    // ─── 3. İZİN GÜNCELLEME ───
+
     @Transactional
     public Izin izinGuncelle(String id, Izin guncelIzin) {
         Izin mevcutIzin = izinRepository.findById(id)
@@ -74,7 +73,7 @@ public class IzinService {
         return izinRepository.save(mevcutIzin);
     }
 
-    // ─── 4. İZİN SİLME ───
+
     @Transactional
     public void izinSil(String id) {
         if (!izinRepository.existsById(id)) {
@@ -83,7 +82,7 @@ public class IzinService {
         izinRepository.deleteById(id);
     }
 
-    // ─── ORTAK VALİDASYON METODU ───
+
     private void validasyonlariKontrolEt(Izin izin) {
         if (izin.getIzinTuru() == null || izin.getIzinTuru().getId() == null) {
             throw new IllegalArgumentException("Hata: İzin türü boş bırakılamaz!");

@@ -1,10 +1,9 @@
-// API Adresi
 const API_BASE_URL = 'http://localhost:8080/api/personeller';
 const DEPARTMAN_API_URL = 'http://localhost:8080/api/departmanlar';
 const IZIN_TURU_API_URL = 'http://localhost:8080/api/izin-turleri';
 
 
-// Sayfalar (Bölümler)
+
 const homePage = document.getElementById('homePage');
 const detailPage = document.getElementById('detailPage');
 const updatePage = document.getElementById('updatePage');
@@ -13,33 +12,33 @@ const leavePage = document.getElementById('leavePage');
 const leaveListPage = document.getElementById('leaveListPage');
 const leaveUpdatePage = document.getElementById('leaveUpdatePage');
 
-// Elemanlar
+
 const personelTableBody = document.getElementById('personelTableBody');
 const statusMessage = document.getElementById('statusMessage');
 const customContextMenu = document.getElementById('customContextMenu');
 const themeToggleBtn = document.getElementById('themeToggle');
 const izinListesiBody = document.getElementById('izinListesiBody');
 
-// Excel Elemanları
+
 const excelFile = document.getElementById('excelFile');
 const btnExcelSec = document.getElementById('btnExcelSec');
 const btnExcelIndir = document.getElementById('btnExcelIndir');
 
-// Formlar
+
 const personelForm = document.getElementById('personelForm');
 const updateForm = document.getElementById('updateForm');
 const leaveForm = document.getElementById('leaveForm');
 const leaveUpdateForm = document.getElementById('leaveUpdateForm');
 const IZIN_API_URL = 'http://localhost:8080/api/izinler';
 
-// Hafızada tutulacak geçici değişkenler
+
 let selectedPersonelId = null;
-let activePersonelData = []; // Tüm personellerin listesi buraya saklanacak
+let activePersonelData = [];
 
-let currentLeavePersonelId = null; // İzin listesini yenilerken kimin listesi olduğunu hatırlamak için
-let currentIzinListData = []; // Silme ve Güncelleme için verileri hafızada tutarız
+let currentLeavePersonelId = null;
+let currentIzinListData = [];
 
-// ─── SAYFA GEÇİŞ YÖNETİMİ (SPA) ───
+
 function showView(targetView) {
     [homePage, detailPage, updatePage, addPage,leavePage, leaveListPage, leaveUpdatePage].forEach(view => {
         view.classList.add('hidden');
@@ -47,7 +46,7 @@ function showView(targetView) {
     targetView.classList.remove('hidden');
 }
 
-// ─── BİLDİRİM MESAJI GÖSTERME ───
+
 function showMessage(text, isSuccess) {
     statusMessage.textContent = text;
     statusMessage.className = `message ${isSuccess ? 'success' : 'error'}`;
@@ -57,13 +56,13 @@ function showMessage(text, isSuccess) {
     }, 5000);
 }
 
-// ─── VERİLERİ BACKEND'DEN ÇEKME ───
+
 function tumPersonelleriGetir() {
     const token = localStorage.getItem('jwtToken');
     fetch(`${API_BASE_URL}/liste`, {
         method: 'GET',
         headers: {
-            'Authorization': 'Bearer ' + token, // Güvenlik kapısından geçmek için ekledik
+            'Authorization': 'Bearer ' + token,
             'Content-Type': 'application/json'
         }
     })
@@ -77,13 +76,11 @@ function tumPersonelleriGetir() {
         })
         .catch(err => {
             console.error("Tablo yükleme hatası:", err);
-            // Eğer backend'de "/liste" ucu henüz yoksa, kullanıcıya uyarı gösteriyoruz:
             personelTableBody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: red;">Personel verileri çekilemedi. Backend tarafına tüm personelleri çeken '/api/personeller/liste' GET ucunu eklemelisiniz!</td></tr>`;
         });
 }
 
 
-// ─── DEPARTMANLARI BACKEND'DEN ÇEK VE KUTULARA DOLDUR ───
 function departmanlariGetir() {
     const token = localStorage.getItem('jwtToken');
     fetch(DEPARTMAN_API_URL, {
@@ -99,7 +96,6 @@ function departmanlariGetir() {
             data.forEach(d => {
                 optionsHTML += `<option value="${d.id}">${d.ad}</option>`;
             });
-            // Hem ekleme hem de güncelleme formundaki select kutularını doldur
             document.getElementById('departman_id').innerHTML = optionsHTML;
             document.getElementById('update-departman_id').innerHTML = optionsHTML;
         })
@@ -107,7 +103,6 @@ function departmanlariGetir() {
 }
 
 
-// ─── İZİN TÜRLERİNİ BACKEND'DEN ÇEK ───
 function izinTurleriniGetir() {
     fetch(IZIN_TURU_API_URL)
         .then(res => res.json())
@@ -122,7 +117,6 @@ function izinTurleriniGetir() {
 }
 
 
-// ─── TABLOYU DOLDURMA ───
 function personelTablosunuDoldur(personeller) {
     personelTableBody.innerHTML = '';
 
@@ -136,11 +130,9 @@ function personelTablosunuDoldur(personeller) {
         tr.style.borderBottom = "1px solid var(--border-color, #eee)";
         tr.dataset.id = p.id;
 
-        // Tarih formatı düzenleme
+
         const sonGuncelleme = p.kartSonGuncelleme ? new Date(p.kartSonGuncelleme).toLocaleString('tr-TR') : '-';
 
-        //Departman kontrolü (Güvenli zincirleme kontrolü)
-        // Eğer personel'in departmanı varsa ve departmanın adı varsa onu yaz, yoksa "Atanmamış" yaz.
         const departmanAdi = (p.departman && p.departman.ad) ? p.departman.ad : '<i>Atanmamış</i>';
 
 
@@ -156,14 +148,14 @@ function personelTablosunuDoldur(personeller) {
 
 
 
-        // 1. Sol Tıklama: Detay Sayfası
+
         tr.addEventListener('click', (e) => {
             detaySayfasiAc(p.id);
         });
 
-        // 2. Sağ Tıklama: Özel Menü
+
         tr.addEventListener('contextmenu', (e) => {
-            e.preventDefault(); // Varsayılan tarayıcı menüsünü engelle
+            e.preventDefault();
             selectedPersonelId = p.id;
             sagTikMenusuGoster(e.clientX, e.clientY);
         });
@@ -172,7 +164,7 @@ function personelTablosunuDoldur(personeller) {
     });
 }
 
-// ─── DETAY SAYFASI AÇMA (SOL TIK) ───
+
 function detaySayfasiAc(id) {
     const p = activePersonelData.find(item => item.id === id);
     if (!p) return;
@@ -192,41 +184,41 @@ function detaySayfasiAc(id) {
     showView(detailPage);
 }
 
-// ─── SAĞ TIK MENÜSÜ GÖSTERİMİ ───
+
 function sagTikMenusuGoster(x, y) {
     customContextMenu.style.left = `${x}px`;
     customContextMenu.style.top = `${y}px`;
     customContextMenu.classList.remove('hidden');
 }
 
-// Menüyü kapatma
+
 window.addEventListener('click', () => {
     customContextMenu.classList.add('hidden');
 });
 
-// ─── MENÜ EYLEMLERİ ───
 
 
-// İZİN EKLE Tıklanınca
+
+
 document.getElementById('menuIzin').addEventListener('click', () => {
     const p = activePersonelData.find(item => item.id === selectedPersonelId);
     if (!p) return;
 
-    // Hangi personele izin eklediğimizi başlıkta gösterelim
+
     document.getElementById('izin-personel-isim').textContent = `${p.ad} ${p.soyad}`;
 
-    leaveForm.reset(); // Formu temizle
-    showView(leavePage); // İzin sayfasını aç
+    leaveForm.reset();
+    showView(leavePage);
 });
 
 
 
-// GÜNCELLE Tıklanınca
+
 document.getElementById('menuGuncelle').addEventListener('click', () => {
     const p = activePersonelData.find(item => item.id === selectedPersonelId);
     if (!p) return;
 
-    // Güncelleme formunu doldur
+
     document.getElementById('update-id').value = p.id;
     document.getElementById('update-tckn').value = p.tckn;
     document.getElementById('update-ad').value = p.ad;
@@ -236,7 +228,7 @@ document.getElementById('menuGuncelle').addEventListener('click', () => {
     document.getElementById('update-yas').value = p.yas || '';
     document.getElementById('update-maas').value = p.maas || '';
     document.getElementById('update-iseGiris').value = p.iseGirisTarihi || '';
-    // YENİ: Personelin mevcut departmanı varsa onu seçili hale getir
+
     if (p.departman && p.departman.id) {
         document.getElementById('update-departman_id').value = p.departman.id;
     } else {
@@ -246,10 +238,9 @@ document.getElementById('menuGuncelle').addEventListener('click', () => {
     showView(updatePage);
 });
 
-// SİL Tıklanınca
+
 document.getElementById('menuSil').addEventListener('click', () => {
     if (confirm('Bu personeli silmek istediğinize emin misiniz?')) {
-        // Backend'deki deleteById metoduna DELETE isteği gönderiyoruz
         fetch(`${API_BASE_URL}/sil/${selectedPersonelId}`, {
             method: 'DELETE'
         })
@@ -270,26 +261,24 @@ document.getElementById('menuSil').addEventListener('click', () => {
 });
 
 
-
-// ─── İZİNLERİ GÖSTER MENÜSÜNE TIKLANINCA ───
 document.getElementById('menuIzinListe').addEventListener('click', () => {
     const p = activePersonelData.find(item => item.id === selectedPersonelId);
     if (!p) return;
 
-    currentLeavePersonelId = p.id; // Personeli hafızaya al
+    currentLeavePersonelId = p.id;
     document.getElementById('izin-liste-personel-isim').textContent = `${p.ad} ${p.soyad}`;
 
     izinleriGetirVeCiz(currentLeavePersonelId);
     showView(leaveListPage);
 });
 
-// GET /api/personeller/{id}/izinler İsteği
+
 function izinleriGetirVeCiz(personelId) {
     fetch(`http://localhost:8080/api/personeller/${personelId}/izinler`)
         .then(res => res.json())
         .then(data => {
-            currentIzinListData = data; // Veriyi global hafızaya al (Düzenle butonu için lazım)
-            izinListesiBody.innerHTML = ''; // Tabloyu temizle
+            currentIzinListData = data;
+            izinListesiBody.innerHTML = '';
 
             if (data.length === 0) {
                 izinListesiBody.innerHTML = '<tr><td colspan="5" style="text-align:center;">Bu personelin kayıtlı izni bulunmuyor.</td></tr>';
@@ -333,7 +322,7 @@ window.izinSil = function(izinId) {
         .then(res => {
             if (res.ok) {
                 showMessage("İzin başarıyla silindi!", true);
-                izinleriGetirVeCiz(currentLeavePersonelId); // Tabloyu anında yenile
+                izinleriGetirVeCiz(currentLeavePersonelId);
             } else {
                 showMessage("Silme işlemi başarısız oldu.", false);
             }
@@ -341,18 +330,18 @@ window.izinSil = function(izinId) {
         .catch(err => showMessage("Sunucuya bağlanılamadı!", false));
 }
 
-// ─── İZİN DÜZENLE EKRANINI AÇMA ───
+
 window.izinDuzenleEkraniniAc = function(izinId) {
     const izin = currentIzinListData.find(i => i.id === izinId);
     if (!izin) return;
 
-    // Formu doldur
+
     document.getElementById('guncelle-izin-id').value = izin.id;
     document.getElementById('guncelle-izin-baslangic').value = izin.baslangicTarihi;
     document.getElementById('guncelle-izin-bitis').value = izin.bitisTarihi;
     document.getElementById('guncelle-izin-aciklamasi').value = izin.izinAciklamasi || '';
 
-    // İzin türleri menüsünü diğer formdan (izin-turu) birebir kopyalayıp içine koyuyoruz
+
     const guncelleTurSelect = document.getElementById('guncelle-izin-turu');
     guncelleTurSelect.innerHTML = document.getElementById('izin-turu').innerHTML;
 
@@ -365,8 +354,6 @@ window.izinDuzenleEkraniniAc = function(izinId) {
 
 
 
-
-// ─── GÜNCELLEME FORMU KAYDETME (SUBMIT) ───
 updateForm.addEventListener('submit', (e) => {
     e.preventDefault();
 
@@ -393,7 +380,7 @@ updateForm.addEventListener('submit', (e) => {
         }
     };
 
-    // Güncelleme için de backend'deki /kaydet POST ucunu kullanıyoruz (çünkü kodunuzda TCKN varsa güncelliyor)
+
     fetch(`${API_BASE_URL}/${personelId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
@@ -412,7 +399,7 @@ updateForm.addEventListener('submit', (e) => {
         .catch(err => showMessage("Güncelleme sırasında hata oluştu!", false));
 });
 
-// ─── YENİ EKLEME FORMU KAYDETME (TC UYARILI) ───
+
 personelForm.addEventListener('submit', (e) => {
     e.preventDefault();
 
@@ -422,8 +409,7 @@ personelForm.addEventListener('submit', (e) => {
 
     const tcknVal = document.getElementById('tckn').value;
 
-    // 🔍 TC Kimlik No - Sadece Rakam Kontrolü ve Uzunluk Kontrolü (İstediğin Kritik Regex Kodu)
-    if (!/^\d+$/.test(tcknVal)) {
+    if (!/^\d+$/.test(tcknVal)) {        //TC regex kontrolü
         showMessage('Hata: TCKN sadece rakamlardan oluşmalıdır!', false);
         return;
     }
@@ -473,7 +459,6 @@ personelForm.addEventListener('submit', (e) => {
             showMessage("Kayıt sırasında bağlantı hatası oluştu!", false);
         })
         .finally(() => {
-            // 2. İŞLEM BİTİNCE BUTONU TEKRAR AKTİF ET (Hata olsa bile kilitli kalmasın)
             submitBtn.disabled = false;
             submitBtn.style.opacity = "1";
             submitBtn.textContent = 'Kaydet / Yeni Ekle';
@@ -481,7 +466,6 @@ personelForm.addEventListener('submit', (e) => {
 });
 
 
-// ─── İZİN FORMU KAYDETME (POST) VE VALİDASYON ───
 leaveForm.addEventListener('submit', (e) => {
     e.preventDefault();
 
@@ -489,10 +473,10 @@ leaveForm.addEventListener('submit', (e) => {
     const bitis = document.getElementById('izin-bitis').value;
     const tur = document.getElementById('izin-turu').value;
 
-    // 🔍 TARİH VALİDASYONU: Bitiş tarihi başlangıçtan önce olamaz!
+
     if (new Date(bitis) < new Date(baslangic)) {
         showMessage('Hata: Bitiş tarihi, başlangıç tarihinden önce olamaz!', false);
-        return; // İşlemi durdur
+        return;// İşlemi durdur
     }
 
     const data = {
@@ -528,7 +512,6 @@ leaveForm.addEventListener('submit', (e) => {
 
 
 
-// ─── İZİN GÜNCELLEME (PUT) VE VALİDASYON ───
 leaveUpdateForm.addEventListener('submit', (e) => {
     e.preventDefault();
 
@@ -536,7 +519,7 @@ leaveUpdateForm.addEventListener('submit', (e) => {
     const baslangic = document.getElementById('guncelle-izin-baslangic').value;
     const bitis = document.getElementById('guncelle-izin-bitis').value;
 
-    // Tarih validasyonu
+
     if (new Date(bitis) < new Date(baslangic)) {
         showMessage('Hata: Bitiş tarihi, başlangıç tarihinden önce olamaz!', false);
         return;
@@ -550,7 +533,7 @@ leaveUpdateForm.addEventListener('submit', (e) => {
         },
         izinAciklamasi: document.getElementById('guncelle-izin-aciklamasi').value || null,
         personel: {
-            id: currentLeavePersonelId // Hangi personele ait olduğu
+            id: currentLeavePersonelId
         }
     };
 
@@ -562,8 +545,8 @@ leaveUpdateForm.addEventListener('submit', (e) => {
         .then(async res => {
             if (res.ok) {
                 showMessage("İzin başarıyla güncellendi!", true);
-                izinleriGetirVeCiz(currentLeavePersonelId); // Verileri yenile
-                showView(leaveListPage); // Listeye geri dön
+                izinleriGetirVeCiz(currentLeavePersonelId);
+                showView(leaveListPage);
             } else {
                 const text = await res.text();
                 showMessage("Hata: " + text, false);
@@ -572,7 +555,7 @@ leaveUpdateForm.addEventListener('submit', (e) => {
         .catch(err => showMessage("Güncellenirken bağlantı hatası oluştu!", false));
 });
 
-// Güncelleme ekranından İzin Listesine geri dönme butonu
+
 document.getElementById('btn-back-to-leave-list').addEventListener('click', () => {
     showView(leaveListPage);
 });
@@ -580,27 +563,23 @@ document.getElementById('btn-back-to-leave-list').addEventListener('click', () =
 
 
 
-
-// ─── GERİ DÖNÜŞ BUTONLARI (GLOBAL KONTROL) ───
 document.querySelectorAll('.btn-back').forEach(btn => {
     btn.addEventListener('click', () => {
         showView(homePage);
     });
 });
 
-// ─── NAVİGASYON: YENİ KİŞİ EKLE BUTONU ───
+
 document.getElementById('btnYeniEkle').addEventListener('click', () => {
     showView(addPage);
 });
 
-// ─── EXCEL ENTEGRASYONLARI ───
 
-// 📤 Excel Yükle Butonuna Tıklanınca Klasik Dosya Seçim Kutusunu Tetikleme
 btnExcelSec.addEventListener('click', () => {
     excelFile.click();
 });
 
-// Dosya seçilince otomatik yükleme tetiklenmesi
+
 excelFile.addEventListener('change', () => {
     const file = excelFile.files[0];
     if (!file) return;
@@ -619,7 +598,7 @@ excelFile.addEventListener('change', () => {
             const text = await res.text();
             if (res.ok) {
                 showMessage(text, true);
-                tumPersonelleriGetir(); // Yeni yüklenenleri anında tabloya getir
+                tumPersonelleriGetir();
             } else {
                 showMessage(text, false);
             }
@@ -628,16 +607,15 @@ excelFile.addEventListener('change', () => {
         .finally(() => {
             btnExcelSec.disabled = false;
             btnExcelSec.textContent = '📤 Excel Yükle';
-            excelFile.value = ''; // Seçimi temizle
+            excelFile.value = '';
         });
 });
 
-// 📥 Excel İndir (Export) - Doğrudan tetikler
 btnExcelIndir.addEventListener('click', () => {
     window.location.href = `${API_BASE_URL}/excel-indir`;
 });
 
-// ─── GECE / GÜNDÜZ MODU ───
+
 const savedTheme = localStorage.getItem('theme');
 if (savedTheme === 'dark') {
     document.body.classList.add('dark-mode');
@@ -655,7 +633,7 @@ themeToggleBtn.addEventListener('click', () => {
     }
 });
 
-// Sayfa ilk açıldığında verileri veritabanından çekelim
+
 document.addEventListener('DOMContentLoaded', () => {
     tumPersonelleriGetir();
     departmanlariGetir();

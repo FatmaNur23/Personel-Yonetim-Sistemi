@@ -15,12 +15,10 @@ public class Departman {
     @Column(nullable = false)
     private String ad;
 
-    // Bir departmanda birden fazla personel bulunabilir
     @OneToMany(mappedBy = "departman", cascade = CascadeType.ALL)
     @JsonIgnore
     private List<Personel> personeller;
 
-    // Constructor, Getter ve Setter Metotları
     public Departman() {}
 
     public Departman(String ad) {

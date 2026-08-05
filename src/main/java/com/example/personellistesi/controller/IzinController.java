@@ -17,7 +17,6 @@ public class IzinController {
     @Autowired
     private IzinService izinService;
 
-    // POST /api/izinler — Yeni izin ekleme
     @PostMapping("/izinler")
     public ResponseEntity<?> izinEkle(@RequestBody Izin izin) {
         try {
@@ -31,7 +30,6 @@ public class IzinController {
         }
     }
 
-    // GET /api/personeller/{personelId}/izinler — Belirli bir personelin tüm izinleri
     @GetMapping("/personeller/{personelId}/izinler")
     public ResponseEntity<?> personeleAitIzinleriGetir(@PathVariable String personelId) {
         try {
@@ -44,7 +42,6 @@ public class IzinController {
         }
     }
 
-    // PUT /api/izinler/{id} — Mevcut izni güncelleme
     @PutMapping("/izinler/{id}")
     public ResponseEntity<?> izinGuncelle(@PathVariable String id, @RequestBody Izin izin) {
         try {
@@ -57,7 +54,6 @@ public class IzinController {
         }
     }
 
-    // DELETE /api/izinler/{id} — İzin silme
     @DeleteMapping("/izinler/{id}")
     public ResponseEntity<?> izinSil(@PathVariable String id) {
         try {

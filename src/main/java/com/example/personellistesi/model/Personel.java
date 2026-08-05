@@ -40,7 +40,7 @@ public class Personel {
     @Column(name = "Kart_son_güncelleme")
     private LocalDateTime kartSonGuncelleme;
 
-    // Entity kaydedilmeden veya güncellenmeden hemen önce çalışır
+
     @PrePersist
     protected void onCreate() {
         if (this.id == null) {
@@ -54,7 +54,7 @@ public class Personel {
         this.kartSonGuncelleme = LocalDateTime.now();
     }
 
-    // Getter ve Setter Metotları (veya Lombok @Data kullanabilirsin)
+
     public String getId() { return id; }
     public void setId(String id) { this.id = id; }
     public String getTckn() { return tckn; }
@@ -76,13 +76,13 @@ public class Personel {
     public LocalDateTime getKartSonGuncelleme() { return kartSonGuncelleme; }
     public void setKartSonGuncelleme(LocalDateTime kartSonGuncelleme) { this.kartSonGuncelleme = kartSonGuncelleme; }
 
-    // Personelin bağlı olduğu Departman
+
     @NotNull(message = "Personel kayıt edilirken departman bilgisi boş bırakılamaz!")
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "departman_id")
     private Departman departman;
 
-    // Personele ait İzinler Listesi
+
     @OneToMany(mappedBy = "personel", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore // JSON dönüşünde sonsuz döngüye (Infinite Loop) girmemesi için
     private List<Izin> izinler;

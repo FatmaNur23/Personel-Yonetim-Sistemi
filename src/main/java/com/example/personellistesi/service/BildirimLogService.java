@@ -39,7 +39,7 @@ public class BildirimLogService implements IBildirimLogService {
         try {
             log.debug("Mail gönderme isteği hazırlanıyor: Target -> {}", kime);
             SimpleMailMessage mesaj = new SimpleMailMessage();
-            mesaj.setFrom("senin.mailin@gmail.com"); // application.properties'e yazdığın mail adresini buraya da yaz
+            mesaj.setFrom("senin.mailin@gmail.com");
             mesaj.setTo(kime);
             mesaj.setSubject(konu);
             mesaj.setText(icerik);
@@ -49,7 +49,6 @@ public class BildirimLogService implements IBildirimLogService {
 
         } catch (Exception e) {
             log.error("E-posta gönderimi sırasında HATA oluştu! Alıcı: {}, Hata Mesajı: {}", kime, e.getMessage(), e);
-            // Mail gönderilemese bile hata fırlatmıyoruz ki veritabanı loglama işlemi yarıda kesilmesin.
         }
     }
 
