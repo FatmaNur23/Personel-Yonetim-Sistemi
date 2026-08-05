@@ -44,7 +44,7 @@ public class Personel {
     @PrePersist
     protected void onCreate() {
         if (this.id == null) {
-            this.id = UUID.randomUUID().toString(); // Yeni kayıt için UUID üretiyoruz
+            this.id = UUID.randomUUID().toString();
         }
         this.kartSonGuncelleme = LocalDateTime.now();
     }
@@ -84,7 +84,7 @@ public class Personel {
 
 
     @OneToMany(mappedBy = "personel", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonIgnore // JSON dönüşünde sonsuz döngüye (Infinite Loop) girmemesi için
+    @JsonIgnore
     private List<Izin> izinler;
 
 

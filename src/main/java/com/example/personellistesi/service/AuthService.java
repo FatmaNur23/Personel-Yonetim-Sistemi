@@ -71,7 +71,7 @@ public class AuthService {
                 .orElseThrow(() -> new RuntimeException("Geçersiz veya süresi dolmuş aktivasyon token'ı!"));
 
         kullanici.setActive(true);
-        kullanici.setActivationToken(null); // Token temizlenir
+        kullanici.setActivationToken(null);
         kullaniciRepository.save(kullanici);
 
         return "Hesabınız başarıyla aktive edildi! Giriş yapabilirsiniz.";
