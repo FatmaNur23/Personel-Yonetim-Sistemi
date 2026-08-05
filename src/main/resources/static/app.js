@@ -247,7 +247,7 @@ document.getElementById('menuSil').addEventListener('click', () => {
             .then(async res => {
                 if (res.ok) {
                     showMessage("Personel başarıyla silindi.", true);
-                    tumPersonelleriGetir(); // Tabloyu yenile
+                    tumPersonelleriGetir();
                 } else {
                     const errText = await res.text();
                     showMessage(`Silme hatası: ${errText}`, false);
@@ -312,7 +312,7 @@ function izinleriGetirVeCiz(personelId) {
 
 
 
-// ─── İZİN SİLME İŞLEMİ ───
+
 window.izinSil = function(izinId) {
     if (!confirm("Bu izin kaydını tamamen silmek istediğinize emin misiniz?")) return;
 
@@ -391,7 +391,7 @@ updateForm.addEventListener('submit', (e) => {
             if (res.ok) {
                 showMessage(text, true);
                 showView(homePage);
-                tumPersonelleriGetir(); // Tabloyu tazele
+                tumPersonelleriGetir();
             } else {
                 showMessage(text, false);
             }
@@ -476,7 +476,7 @@ leaveForm.addEventListener('submit', (e) => {
 
     if (new Date(bitis) < new Date(baslangic)) {
         showMessage('Hata: Bitiş tarihi, başlangıç tarihinden önce olamaz!', false);
-        return;// İşlemi durdur
+        return;
     }
 
     const data = {
@@ -487,7 +487,7 @@ leaveForm.addEventListener('submit', (e) => {
         },
         izinAciklamasi: document.getElementById('izin-aciklamasi').value || null,
         personel: {
-            id: selectedPersonelId // Sağ tıklanan personelin ID'sini yolluyoruz
+            id: selectedPersonelId
         }
     };
 

@@ -16,7 +16,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/personeller")
-@CrossOrigin(origins = "*") // CORS hatası almamak için bunu da ekledik
+@CrossOrigin(origins = "*")
 public class PersonelController {
 
     private final PersonelService personelService;

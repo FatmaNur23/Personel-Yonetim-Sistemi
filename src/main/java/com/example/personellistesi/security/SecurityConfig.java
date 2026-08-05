@@ -28,8 +28,8 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(csrf -> csrf.disable()) // REST API'lerde CSRF genelde kapatılır
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // Session tutmayacağız, JWT kullanacağız
+                .csrf(csrf -> csrf.disable())
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**","/api/departmanlar", "/login.html", "/register.html", "/index.html", "/", "/*.css", "/*.js").permitAll()
                         .anyRequest().authenticated()
