@@ -33,7 +33,6 @@ public class PersonelService {
 
 
 
-    // ─── 1. EXCEL'DEN VERİ OKUMA VE GÜNCELLEME / EKLEME (IMPORT) ───
     @Transactional
     public String excelImport(MultipartFile file) throws Exception {
         List<Personel> exceldenOkunanlar = new ArrayList<>();
@@ -51,14 +50,13 @@ public class PersonelService {
 
                 Personel personel = new Personel();
 
-                // TCKN Okuma
                 String tckn = getCellValueAsString(row.getCell(0)).trim();
-                // Hem uzunluk hem de sadece rakam kontrolünü birleştiriyoruz:
+
                 if (tckn.isEmpty() || tckn.length() != 11 || !tckn.matches("\\d+")) {
                     throw new IllegalArgumentException("Hata: " + i + ". satırdaki TCKN geçersiz! 11 haneli ve sadece rakamlardan oluşmalıdır.");
                 }
 
-                // Excel'in kendi içinde mükerrer TCKN kontrolü
+
                 if (!excelIciTcknSet.add(tckn)) {
                     mukerrerTcknler.add(tckn);
                 }
@@ -68,36 +66,34 @@ public class PersonelService {
                 personel.setSoyad(getCellValueAsString(row.getCell(2)));
                 personel.setTelefon(getCellValueAsString(row.getCell(3)));
 
-                // Yaş
+
                 if (row.getCell(4) != null && row.getCell(4).getCellType() == CellType.NUMERIC) {
                     personel.setYas((int) row.getCell(4).getNumericCellValue());
                 }
 
-                // Maaş
+
                 if (row.getCell(5) != null && row.getCell(5).getCellType() == CellType.NUMERIC) {
                     personel.setMaas((float) row.getCell(5).getNumericCellValue());
                 }
 
-                //Departman
+
                 if (row.getCell(6) != null) {
                     String departmanAdi = getCellValueAsString(row.getCell(6)).trim();
 
                     if (!departmanAdi.isEmpty()) {
-                        // Veritabanında isme göre departman arıyoruz
+
                         Optional<Departman> departmanOpt = departmanRepository.findByAd(departmanAdi);
 
                         if (departmanOpt.isPresent()) {
                             personel.setDepartman(departmanOpt.get());
                         } else {
-                            // Eşleşmeyen departman durumunda satırı atlıyoruz
                             atlananDepartmanSayisi++;
-                            continue; // Döngüyü burada kesip bir sonraki satıra geçer, personeli listeye eklemez
+                            continue;
                         }
                     }
                 }
 
 
-                // İşe Giriş Tarihi
                 if (row.getCell(7) != null && DateUtil.isCellDateFormatted(row.getCell(6))) {
                     Date date = row.getCell(7).getDateCellValue();
                     personel.setIseGirisTarihi(date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
@@ -120,7 +116,6 @@ public class PersonelService {
             Optional<Personel> mevcutPersonelOpt = personelRepository.findByTckn(excelPersonel.getTckn());
 
             if (mevcutPersonelOpt.isPresent()) {
-                // TCKN varsa: MEVCUT BİLGİYİ GÜNCELLE
                 Personel mevcutPersonel = mevcutPersonelOpt.get();
                 mevcutPersonel.setAd(excelPersonel.getAd());
                 mevcutPersonel.setSoyad(excelPersonel.getSoyad());
@@ -133,7 +128,6 @@ public class PersonelService {
                 personelRepository.save(mevcutPersonel);
                 guncellenenSayisi++;
             } else {
-                // TCKN yoksa: YENİ EKLE
                 personelRepository.save(excelPersonel);
                 eklenenSayisi++;
             }
@@ -141,19 +135,19 @@ public class PersonelService {
         return "İşlem Başarılı! " + eklenenSayisi + " personel eklendi, " + guncellenenSayisi + " personel güncellendi.";
     }
 
-    // ─── 2. VERİTABANINDAN EXCEL ÜRETİP İNDİRME (EXPORT) ───
+
     public ByteArrayInputStream exportToExcel() throws Exception {
-        // Sistemdeki tüm personelleri çekiyoruz
+
         List<Personel> personeller = personelRepository.findAll();
 
         try (Workbook workbook = new XSSFWorkbook(); ByteArrayOutputStream out = new ByteArrayOutputStream()) {
             Sheet sheet = workbook.createSheet("com.example.personellistesi.com.example.personellistesi.model.Personel Listesi");
 
-            // Başlık satırını tasarlıyoruz
+
             Row headerRow = sheet.createRow(0);
             String[] headers = {"TCKN", "Ad", "Soyad", "Telefon", "Yaş", "Maaş","Departman", "İşe Giriş Tarihi"};
 
-            // Başlıklar için kalın yazı tipi (Font) stili oluşturuyoruz
+
             CellStyle headerCellStyle = workbook.createCellStyle();
             Font headerFont = workbook.createFont();
             headerFont.setBold(true);
@@ -166,7 +160,7 @@ public class PersonelService {
                 cell.setCellStyle(headerCellStyle);
             }
 
-            // Veritabanından gelen verileri Excel satırlarına yazıyoruz
+
             int rowIdx = 1;
             for (Personel personel : personeller) {
                 Row row = sheet.createRow(rowIdx++);
@@ -188,12 +182,12 @@ public class PersonelService {
                     departmanCell.setCellValue("");
                 }
 
-                // Tarih hücresini formatlıyoruz
+
                 Cell dateCell = row.createCell(7);
                 if (personel.getIseGirisTarihi() != null) {
                     dateCell.setCellValue(java.sql.Date.valueOf(personel.getIseGirisTarihi()));
 
-                    // Excel'de tarihin düzgün görünmesi için stil tanımlıyoruz (YYYY-MM-DD)
+
                     CellStyle dateCellStyle = workbook.createCellStyle();
                     CreationHelper createHelper = workbook.getCreationHelper();
                     dateCellStyle.setDataFormat(createHelper.createDataFormat().getFormat("yyyy-mm-dd"));
@@ -201,7 +195,7 @@ public class PersonelService {
                 }
             }
 
-            // Sütun genişliklerini içeriğe göre otomatik sığdırıyoruz
+
             for (int i = 0; i < headers.length; i++) {
                 sheet.autoSizeColumn(i);
             }
@@ -223,7 +217,7 @@ public class PersonelService {
         };
     }
 
-    // ─── YENİ: PERSONEL EKLEME (POST) ───
+
     @Transactional
     public Personel personelEkle(Personel personel) {
         log.info("Yeni personel ekleme işlemi başlatıldı. İsim: {} {}", personel.getAd(), personel.getSoyad());
@@ -239,7 +233,7 @@ public class PersonelService {
                 });
 
 
-        personel.setDepartman(departman); // Doğrulanmış departmanı atıyoruz
+        personel.setDepartman(departman);
 
         Personel kaydedilenPersonel = personelRepository.save(personel);
         log.info("Personel sisteme başarıyla kaydedildi. Veritabanı ID: {}", kaydedilenPersonel.getId());
@@ -253,12 +247,12 @@ public class PersonelService {
             );
             bildirimLogService.saveLog(yeniLog);
         }
-        // 3. EKLENEN YER: Kaydedilen personeli geri döndürüyoruz
         return kaydedilenPersonel;
 
     }
 
-    // ─── YENİ: PERSONEL GÜNCELLEME (PUT) ───
+
+
     @Transactional
     public Personel personelGuncelle(String id, Personel guncelBilgiler) {
         log.info("Personel güncelleme isteği alındı. Güncellenecek ID: {}", id);
@@ -269,14 +263,14 @@ public class PersonelService {
                     return new IllegalArgumentException("Güncellenecek personel bulunamadı!");
                 });
 
-        // Yeni departman atanmışsa doğrula ve güncelle
+
         if (guncelBilgiler.getDepartman() != null && guncelBilgiler.getDepartman().getId() != null) {
             Departman yeniDepartman = departmanRepository.findById(guncelBilgiler.getDepartman().getId())
                     .orElseThrow(() -> new IllegalArgumentException("Atanmak istenen yeni departman bulunamadı!"));
             mevcutPersonel.setDepartman(yeniDepartman);
         }
 
-        // Diğer bilgileri güncelle
+
         mevcutPersonel.setAd(guncelBilgiler.getAd());
         mevcutPersonel.setSoyad(guncelBilgiler.getSoyad());
         mevcutPersonel.setEmail(guncelBilgiler.getEmail());
@@ -301,12 +295,11 @@ public class PersonelService {
         return guncellenenPersonel;
     }
 
-    // ─── TÜM PERSONELLERİ LİSTELEME SERVİSİ ───
     public List<Personel> tumunuGetir() {
         return personelRepository.findAll();
     }
 
-    // ─── ID'YE GÖRE PERSONEL SİLME SERVİSİ ───
+
     @Transactional
     public void idIleSil(String id) {
         log.info("Personel silme işlemi başlatıldı. Silinecek ID: {}", id);

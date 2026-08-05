@@ -19,14 +19,14 @@ public class JwtTokenProvider {
 
         return Jwts.builder()
                 .setSubject(username)
-                .claim("role", role) // Kullanıcının rolünü token içine gömüyoruz
+                .claim("role", role)
                 .setIssuedAt(now)
                 .setExpiration(expiryDate)
                 .signWith(key)
                 .compact();
     }
 
-    //  Token'dan Kullanıcı Adını Çözme
+
     public String getUsernameFromJWT(String token) {
         Claims claims = Jwts.parserBuilder()
                 .setSigningKey(key)
@@ -37,7 +37,7 @@ public class JwtTokenProvider {
         return claims.getSubject();
     }
 
-    //  Token Geçerlilik Kontrolü
+
     public boolean validateToken(String token) {
         try {
             Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
@@ -48,7 +48,7 @@ public class JwtTokenProvider {
         }
     }
 
-    // Token'dan Kullanıcı Adını Çözme (Parse etme)
+
     public String getUsernameFromToken(String token) {
         Claims claims = Jwts.parserBuilder()
                 .setSigningKey(key)

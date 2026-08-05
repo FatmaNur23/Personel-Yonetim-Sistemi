@@ -7,7 +7,7 @@ import java.util.List;
 
 @Repository
 public interface IzinRepository extends JpaRepository<Izin, String> {
-    // Personel ID'sine göre o personelin tüm izinlerini getirecek özel metot
+
     List<Izin> findByPersonelId(String personelId);
 
 }

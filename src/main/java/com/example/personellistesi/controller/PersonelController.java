@@ -26,7 +26,6 @@ public class PersonelController {
         this.personelService = personelService;
     }
 
-    // ─── GET API: Tüm personelleri JSON listesi olarak döner (Yeni eklenen - Önyüz tablosu için) ───
     @GetMapping("/liste")
     public ResponseEntity<List<Personel>> tumunuListele() {
         try {
@@ -37,7 +36,6 @@ public class PersonelController {
         }
     }
 
-    // ─── DELETE API: ID'ye göre personel siler (Yeni eklenen - Önyüz sağ tık sil seçeneği için) ───
     @DeleteMapping("/sil/{id}")
     public ResponseEntity<String> sil(@PathVariable String id) {
         try {
@@ -48,7 +46,6 @@ public class PersonelController {
         }
     }
 
-    // ─── POST API: Excel Dosyasını Yükler (Yeni ekler veya TCKN varsa günceller) ───
     @PostMapping("/excel-yukle")
     public ResponseEntity<String> excelYukle(@RequestParam("file") MultipartFile file) {
         try {
@@ -61,7 +58,6 @@ public class PersonelController {
         }
     }
 
-    // ─── GET API: Sistemdeki Personelleri Excel Olarak İndirir (EXPORT) ───
     @GetMapping("/excel-indir")
     public ResponseEntity<InputStreamResource> excelIndir() {
         try {
@@ -81,7 +77,6 @@ public class PersonelController {
         }
     }
 
-    // ─── YENİ POST API: Tekli Personel Ekleme (Departman Seçimli) ───
     @PostMapping
     public ResponseEntity<?> personelEkle(@RequestBody Personel personel) {
         try {
@@ -94,7 +89,6 @@ public class PersonelController {
         }
     }
 
-    // ─── YENİ PUT API: Tekli Personel Güncelleme (Departman Değişikliği Destekli) ───
     @PutMapping("/{id}")
     public ResponseEntity<?> personelGuncelle(@PathVariable String id, @RequestBody Personel personel) {
         try {

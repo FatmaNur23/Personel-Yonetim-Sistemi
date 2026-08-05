@@ -25,12 +25,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     public void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
 
-        // 1. İstekten Header'ı al
+
         String header = request.getHeader("Authorization");
         String token = null;
         String username = null;
 
-        // 2. Header "Bearer " ile başlıyor mu kontrol et
+
         if (header != null && header.startsWith("Bearer ")) {
             token = header.substring(7); // "Bearer " kısmını at, sadece token'ı al
             try {
@@ -40,7 +40,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             }
         }
 
-        // 3. Kullanıcı adı bulunduysa ve sistemde henüz oturum açılmadıysa
+
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             if (tokenProvider.validateToken(token)) {
                 // Kullanıcıyı doğrulanmış olarak Spring Security'ye kaydet
@@ -52,7 +52,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             }
         }
 
-        // Yoluna devam et
+
         filterChain.doFilter(request, response);
     }
 

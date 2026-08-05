@@ -9,33 +9,28 @@
 <body>
 
 <div class="container">
-    <!-- Üst Bar: Başlık ve Gece Modu Butonu -->
     <div class="top-bar">
         <h1>👤 Personel Yönetim Sistemi</h1>
         <button id="themeToggle" class="btn-theme">🌙 Gece Modu</button>
     </div>
 
-    <!-- Durum Bildirimleri için Ortak Alan -->
     <div id="statusMessage" class="message hidden"></div>
 
-    <!-- ========================================== -->
-    <!-- 🏠 BÖLÜM 1: ANA SAYFA (PERSONEL TABLOSU)  -->
-    <!-- ========================================== -->
+
+    <!--  BÖLÜM 1: ANA SAYFA (PERSONEL TABLOSU)  -->
     <section id="homePage" class="view-section">
-        <!-- Üst Butonlar -->
         <div class="action-bar">
             <div class="left-actions">
                 <button id="btnYeniEkle" class="btn btn-primary">➕ Yeni Kişi Ekle</button>
             </div>
             <div class="right-actions">
-                <!-- Excel Yükleme Girişi (Gizli input, şık butona bağlı) -->
                 <input type="file" id="excelFile" accept=".xlsx" style="display: none;" />
                 <button id="btnExcelSec" class="btn btn-info">📤 Excel Yükle</button>
                 <button id="btnExcelIndir" class="btn btn-success">📥 Excel İndir</button>
             </div>
         </div>
 
-        <!-- Ana Tablo -->
+
         <div class="card">
             <h2>📋 Personel Listesi</h2>
             <p class="info-text">* Bilgileri görmek için satıra <strong>Sol Tıklayın</strong>. Güncellemek veya silmek için satıra <strong>Sağ Tıklayın</strong>.</p>
@@ -54,7 +49,6 @@
                     </tr>
                     </thead>
                     <tbody id="personelTableBody">
-                    <!-- Veriler JS ile buraya dolacak -->
                     <tr>
                         <td colspan="6" style="text-align: center;">Yükleniyor...</td>
                     </tr>
@@ -64,9 +58,10 @@
         </div>
     </section>
 
-    <!-- ========================================== -->
-    <!-- 🔍 BÖLÜM 2: DETAY SAYFASI                 -->
-    <!-- ========================================== -->
+
+
+    <!--  BÖLÜM 2: DETAY SAYFASI   -->
+
     <section id="detailPage" class="view-section hidden">
         <button class="btn btn-secondary btn-back">⬅ Geri Dön</button>
 
@@ -74,14 +69,11 @@
             <h2>👤 Personel Detay Bilgisi</h2>
 
             <div class="detail-layout">
-                <!-- Sol Üst Köşedeki Fotoğraf Alanı -->
                 <div class="photo-area">
                     <div class="photo-box">
                         <span class="photo-placeholder">👤<br>Fotoğraf Yok</span>
                     </div>
                 </div>
-
-                <!-- Sağdaki Detay Tablosu -->
                 <div class="detail-info-table">
                     <table>
                         <tr><th>ID:</th><td id="detay-id">-</td></tr>
@@ -100,9 +92,9 @@
         </div>
     </section>
 
-    <!-- ========================================== -->
-    <!-- ✍️ BÖLÜM 3: GÜNCELLEME SAYFASI             -->
-    <!-- ========================================== -->
+
+
+    <!--  BÖLÜM 3: GÜNCELLEME SAYFASI   -->
     <section id="updatePage" class="view-section hidden">
         <button class="btn btn-secondary btn-back">⬅ İptal Et ve Geri Dön</button>
 
@@ -136,7 +128,6 @@
                     <input type="text" id="update-telefon">
                 </div>
 
-                <!-- YENİ EKLENEN: GÜNCELLEME İÇİN DEPARTMAN SEÇİMİ -->
                 <div class="form-group full-width">
                     <label for="update-departman_id">Departman:</label>
                     <select id="update-departman_id" required style="padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; background-color: var(--input-bg); color: var(--text-color);">
@@ -167,9 +158,9 @@
         </div>
     </section>
 
-    <!-- ========================================== -->
-    <!-- ➕ BÖLÜM 4: YENİ EKLEME SAYFASI            -->
-    <!-- ========================================== -->
+
+
+    <!--  BÖLÜM 4: YENİ EKLEME SAYFASI     -->
     <section id="addPage" class="view-section hidden">
         <button class="btn btn-secondary btn-back">⬅ Vazgeç ve Geri Dön</button>
 
@@ -201,7 +192,6 @@
                     <input type="text" id="telefon" placeholder="05001234567">
                 </div>
 
-                <!-- YENİ EKLENEN: EKLEME İÇİN DEPARTMAN SEÇİMİ -->
                 <div class="form-group full-width">
                     <label for="departman_id">Departman:</label>
                     <select id="departman_id" required style="padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; background-color: var(--input-bg); color: var(--text-color);">
@@ -234,9 +224,8 @@
 </div>
 
 
-<!-- ========================================== -->
-<!-- 🌴 BÖLÜM 5: İZİN EKLEME SAYFASI            -->
-<!-- ========================================== -->
+
+<!--   BÖLÜM 5: İZİN EKLEME SAYFASI    -->
 <section id="leavePage" class="view-section hidden">
     <button class="btn btn-secondary btn-back">⬅ Vazgeç ve Geri Dön</button>
 
@@ -275,9 +264,8 @@
 
 
 
-<!-- ========================================== -->
-<!-- 👀 BÖLÜM 6: İZİN LİSTESİ SAYFASI           -->
-<!-- ========================================== -->
+
+<!--   BÖLÜM 6: İZİN LİSTESİ SAYFASI   -->
 <section id="leaveListPage" class="view-section hidden">
     <button class="btn btn-secondary btn-back" style="margin-bottom: 15px;">⬅ Geri Dön</button>
 
@@ -286,7 +274,6 @@
             <h2 style="margin: 0;">👀 Personel İzinleri (<span id="izin-liste-personel-isim" style="color: var(--primary-color);"></span>)</h2>
         </div>
 
-        <!-- Ana sayfadaki tablo görünümünü veren taşıyıcı div -->
         <div class="table-container" style="overflow-x: auto; padding: 20px;">
             <table class="data-table" style="width: 100%; border-collapse: collapse; text-align: left;">
                 <thead>
@@ -299,7 +286,6 @@
                 </tr>
                 </thead>
                 <tbody id="izinListesiBody">
-                <!-- JS ile dinamik dolacak -->
                 </tbody>
             </table>
         </div>
@@ -307,15 +293,13 @@
 </section>
 
 
-<!-- ========================================== -->
-<!-- ✏️ BÖLÜM 7: İZİN GÜNCELLEME SAYFASI       -->
-<!-- ========================================== -->
+
+<!--   BÖLÜM 7: İZİN GÜNCELLEME SAYFASI   -->
 <section id="leaveUpdatePage" class="view-section hidden">
     <button class="btn btn-secondary" id="btn-back-to-leave-list">⬅ İzin Listesine Dön</button>
     <div class="card">
         <h2>✏️ İzni Güncelle</h2>
         <form id="leaveUpdateForm" class="grid-form">
-            <!-- Güncellenecek iznin ID'sini gizli tutuyoruz -->
             <input type="hidden" id="guncelle-izin-id">
 
             <div class="form-group">
@@ -331,7 +315,6 @@
             <div class="form-group full-width">
                 <label for="guncelle-izin-turu">İzin Türü:</label>
                 <select id="guncelle-izin-turu" required style="padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; background-color: var(--input-bg); color: var(--text-color); height: 42px;">
-                    <!-- Seçenekler JS ile kopyalanacak -->
                 </select>
             </div>
 
@@ -349,7 +332,7 @@
 
 
 
-<!-- 🌐 ÖZEL SAĞ TIK MENÜSÜ (CONTEXT MENU) -->
+<!--  ÖZEL SAĞ TIK MENÜSÜ (CONTEXT MENU) -->
 <div id="customContextMenu" class="context-menu hidden">
     <ul>
         <li id="menuGuncelle">✏️ Güncelle</li>
@@ -366,12 +349,12 @@
     window.onload = function() {
         const token = localStorage.getItem('jwtToken');
         if (!token) {
-            window.location.href = 'login.html'; // Giriş yapmamışsa login'e atar
+            window.location.href = 'login.html';
         }
     };
     function logout() {
-        localStorage.removeItem('jwtToken'); // Token'ı siler
-        window.location.href = 'login.html'; // Giriş ekranına gönderir
+        localStorage.removeItem('jwtToken');
+        window.location.href = 'login.html';
     }
 </script>
 

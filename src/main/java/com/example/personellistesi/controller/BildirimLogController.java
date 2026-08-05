@@ -11,18 +11,16 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/bildirim-loglari")
-@CrossOrigin(origins = "*") // CORS hatası almamak için
+@CrossOrigin(origins = "*")
 public class BildirimLogController {
 
     private  IBildirimLogService bildirimLogService;
 
-    // Dependency Injection doğrudan Interface üzerinden yapılıyor
     @Autowired
     public BildirimLogController(IBildirimLogService bildirimLogService) {
         this.bildirimLogService = bildirimLogService;
     }
 
-    // ─── GET API: Tüm Bildirim Loglarını Listeler (Önyüzdeki tablo için)
     @GetMapping
     public ResponseEntity<List<BildirimLog>> tumLoglariListele() {
         try {
@@ -33,7 +31,6 @@ public class BildirimLogController {
         }
     }
 
-    // ─── GET API: ID'ye göre tekil log getirir
     @GetMapping("/{id}")
     public ResponseEntity<?> idIleGetir(@PathVariable String id) {
         try {
@@ -44,8 +41,6 @@ public class BildirimLogController {
         }
     }
 
-    // ─── GET API: Belirli bir e-posta adresine giden logları filtreler
-    // Örnek kullanım: /api/bildirim-loglari/alici?email=ahmet@ornek.com
     @GetMapping("/alici")
     public ResponseEntity<List<BildirimLog>> aliciyaGoreFiltrele(@RequestParam("email") String toAddress) {
         try {
@@ -56,7 +51,6 @@ public class BildirimLogController {
         }
     }
 
-    // ─── POST API: Manuel olarak log ekleme
     @PostMapping
     public ResponseEntity<?> logEkle(@RequestBody BildirimLog bildirimLog) {
         try {

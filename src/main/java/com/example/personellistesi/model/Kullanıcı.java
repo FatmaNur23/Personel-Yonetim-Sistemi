@@ -38,7 +38,7 @@ public class Kullanıcı {
     @JoinColumn(name = "role_id", nullable = false)
     private Role role;
 
-    // Kayıt oluşturulurken otomatik UUID atamak istersen:
+
     @PrePersist
     public void prePersist() {
         if (this.id == null) {
