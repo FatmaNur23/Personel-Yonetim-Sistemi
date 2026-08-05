@@ -32,7 +32,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
 
         if (header != null && header.startsWith("Bearer ")) {
-            token = header.substring(7); // "Bearer " kısmını at, sadece token'ı al
+            token = header.substring(7);
             try {
                 username = tokenProvider.getUsernameFromToken(token);
             } catch (Exception e) {
@@ -43,7 +43,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             if (tokenProvider.validateToken(token)) {
-                // Kullanıcıyı doğrulanmış olarak Spring Security'ye kaydet
+
                 UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
                         username, null, new ArrayList<>()
                 );
